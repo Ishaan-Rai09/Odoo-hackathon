@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Clock, MapPin, Users, ExternalLink, Trophy, Star } from 'lucide-react'
+import { TicketBooking } from '@/components/ticket-booking'
+import { Calendar, Clock, MapPin, Users, ExternalLink, Trophy, Star, Ticket } from 'lucide-react'
 import { formatDate, formatTime, getBadgeColor, getRegistrationProgress, getDifficultyColor } from '@/lib/utils'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,7 +18,34 @@ interface EventModalProps {
 }
 
 export function EventModal({ event, isOpen, onClose }: EventModalProps) {
+  const [showTicketBooking, setShowTicketBooking] = useState(false)
+  
   if (!event) return null
+
+  // Add default pricing if not provided
+  const eventWithPricing = {
+    ...event,
+    standardPrice: event.standardPrice ?? (event.price === 0 ? 0 : event.price || 25),
+    vipPrice: event.vipPrice ?? (event.price === 0 ? 0 : (event.price ? event.price * 2 : 75))
+  }
+
+  const handleBookTickets = () => {
+    setShowTicketBooking(true)
+  }
+
+  const handleCloseTicketBooking = () => {
+    setShowTicketBooking(false)
+  }
+
+  if (showTicketBooking) {
+    return (
+      <TicketBooking
+        event={eventWithPricing}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
+    )
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -173,14 +202,47 @@ export function EventModal({ event, isOpen, onClose }: EventModalProps) {
               </div>
             </div>
 
+            {/* Pricing Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+              <div className="glassmorphism rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white/80 text-sm">Standard Ticket</div>
+                    <div className="text-white font-medium">
+                      {eventWithPricing.standardPrice === 0 ? 'Free' : `$${eventWithPricing.standardPrice}`}
+                    </div>
+                  </div>
+                  <Ticket className="h-5 w-5 text-cyber-blue" />
+                </div>
+              </div>
+              <div className="glassmorphism rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-white/80 text-sm">VIP Ticket</div>
+                    <div className="text-yellow-400 font-medium">
+                      {eventWithPricing.vipPrice === 0 ? 'Free' : `$${eventWithPricing.vipPrice}`}
+                    </div>
+                  </div>
+                  <Trophy className="h-5 w-5 text-yellow-400" />
+                </div>
+              </div>
+            </div>
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/20">
-              <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1">
-                <Button variant="glow" size="lg" className="w-full">
-                  <ExternalLink className="h-5 w-5 mr-2" />
-                  Register Now
-                </Button>
-              </Link>
+              <Button variant="glow" size="lg" onClick={handleBookTickets} className="flex-1">
+                <Ticket className="h-5 w-5 mr-2" />
+                Book Tickets
+              </Button>
+              
+              {event.registrationLink && (
+                <Link href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="flex-1">
+                  <Button variant="outline" size="lg" className="w-full border-white/20 text-white hover:bg-white/10">
+                    <ExternalLink className="h-5 w-5 mr-2" />
+                    External Link
+                  </Button>
+                </Link>
+              )}
               
               <Button variant="outline" size="lg" onClick={onClose} className="border-white/20 text-white hover:bg-white/10">
                 Close

@@ -124,17 +124,6 @@ export function HeroSection() {
               Join Community
             </Button>
           </Link>
-
-          <Link href="/organizer/signin">
-            <Button
-              variant="cyber"
-              size="lg"
-              className="text-lg px-8 py-4 h-auto bg-gradient-to-r from-cyber-purple to-cyber-pink hover:shadow-lg hover:shadow-cyber-purple/25"
-            >
-              Organizer Portal
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
         </motion.div>
 
         {/* Stats */}

@@ -11,12 +11,14 @@ export default authMiddleware({
     "/api/organizer/(.*)",
     "/api/events",
     "/api/populate-db",
+    "/api/placeholder/(.*)",
   ],
   ignoredRoutes: [
     "/api/webhooks/(.*)",
     "/api/organizer/(.*)",
     "/api/events",
     "/api/populate-db",
+    "/api/placeholder/(.*)",
   ],
 });
 

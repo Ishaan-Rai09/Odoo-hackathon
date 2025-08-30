@@ -187,8 +187,13 @@ export async function GET(request: NextRequest) {
       })
     )
 
-    // Combine static and MongoDB events
-    let allEvents = [...staticEvents, ...transformedMongoEvents]
+    // Only include static events that have working detail pages (none currently)
+    // For now, we'll exclude static events since they don't have detail pages
+    // let allEvents = [...staticEvents, ...transformedMongoEvents]
+    let allEvents = [...transformedMongoEvents]
+    
+    // Add isMongoEvent flag to indicate these have working detail pages
+    allEvents = allEvents.map(event => ({ ...event, isMongoEvent: true }))
 
     // Apply filters
     if (category && category !== 'all') {

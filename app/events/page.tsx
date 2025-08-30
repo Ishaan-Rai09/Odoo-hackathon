@@ -181,7 +181,36 @@ export default function EventsPage() {
               >
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-2xl font-bold text-white mb-4">No events found</h3>
-                <p className="text-white/60">Try adjusting your search or filter criteria</p>
+                <p className="text-white/60 mb-6">
+                  {selectedCategory === 'all' && searchTerm === '' 
+                    ? 'No events available. Would you like to load some sample events?' 
+                    : 'Try adjusting your search or filter criteria'}
+                </p>
+                {selectedCategory === 'all' && searchTerm === '' && (
+                  <Button 
+                    variant="cyber" 
+                    onClick={async () => {
+                      setLoading(true)
+                      try {
+                        const response = await fetch('/api/populate-db', { method: 'POST' })
+                        if (response.ok) {
+                          // Refresh events after populating
+                          const eventsResponse = await fetch('/api/events')
+                          if (eventsResponse.ok) {
+                            const data = await eventsResponse.json()
+                            setEvents(data.events || [])
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Error populating database:', error)
+                      } finally {
+                        setLoading(false)
+                      }
+                    }}
+                  >
+                    Load Sample Events
+                  </Button>
+                )}
               </motion.div>
             ) : (
               <motion.div
@@ -286,7 +315,7 @@ export default function EventsPage() {
                         )}
 
                         {/* CTA Button */}
-                        <Link href={event.isMongoEvent ? `/events/details/${event.id}` : `/events/${event.categoryId}/${event.id}`}>
+                        <Link href={`/events/details/${event.id}`}>
                           <Button variant="cyber" className="w-full">
                             View Details
                           </Button>
