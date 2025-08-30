@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Menu, X, Search, Ticket, Settings, User, LogOut } from 'lucide-react'
 import Link from 'next/link'
 
-export function Navbar() {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)

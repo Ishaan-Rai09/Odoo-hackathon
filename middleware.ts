@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
 
 // Define routes that require authentication
 const protectedRoutes = [
   '/dashboard',
   '/profile',
-  '/bookings'
+  '/bookings',
+  '/admin',
+  '/my-bookings'
 ]
 
 // Define routes that should redirect authenticated users
@@ -27,19 +28,8 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('auth-token')?.value
 
-  // Simple token validation (without database check for middleware)
-  let isAuthenticated = false
-  
-  if (token) {
-    try {
-      const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key'
-      jwt.verify(token, JWT_SECRET)
-      isAuthenticated = true
-    } catch (error) {
-      // Token is invalid
-      isAuthenticated = false
-    }
-  }
+  // Simple token presence check (detailed validation happens in API routes)
+  const isAuthenticated = !!token
 
   // Handle protected routes
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
@@ -51,10 +41,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Handle auth routes (sign-in, sign-up) - redirect if already authenticated
+  // Handle auth routes (sign-in, sign-up) - redirect if already authenticated  
   if (authRoutes.some(route => pathname.startsWith(route))) {
     if (isAuthenticated) {
-      const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/dashboard'
+      const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/'
       return NextResponse.redirect(new URL(redirectTo, request.url))
     }
   }

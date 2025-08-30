@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { DiscountService } from '@/backend/services/discount-service'
 
 export async function POST(request: NextRequest) {
   try {

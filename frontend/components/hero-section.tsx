@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowRight, Calendar, Users, Trophy } from 'lucide-react'
 import Link from 'next/link'
 
-export function HeroSection() {
+export default function HeroSection() {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

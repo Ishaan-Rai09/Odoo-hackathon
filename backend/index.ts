@@ -17,11 +17,11 @@ export * from './services/sample-events'
 
 // API Routes (for Next.js integration)
 // These are exported for Next.js to use in app/api/ directory
-export { GET as getEvents, POST as createEvent } from './api/events/route'
+export { GET as getEvents } from './api/events/route'
 export { GET as getBookings, POST as createBooking, DELETE as deleteBooking } from './api/bookings/route'
 export { GET as getLoyalty, POST as updateLoyalty } from './api/loyalty/route'
 export { POST as organizerLogin } from './api/organizer/login/route'
 export { POST as organizerRegister } from './api/organizer/register/route'
 
 // Middleware
-export { default as authMiddleware } from './middleware/auth-middleware'
+// TODO: Add auth middleware when needed

@@ -57,12 +57,12 @@ export async function GET(
       totalAttendees: 0,
       checkedInCount: 0,
       demographics: {
-        ageGroups: {},
-        genderDistribution: {},
-        locationDistribution: {}
+        ageGroups: {} as Record<string, number>,
+        genderDistribution: {} as Record<string, number>,
+        locationDistribution: {} as Record<string, number>
       },
-      dailyBookings: [],
-      ticketTypeStats: event.ticketTypes.map(ticket => ({
+      dailyBookings: [] as Array<{date: string, bookings: number, revenue: number}>,
+      ticketTypeStats: event.ticketTypes.map((ticket: any) => ({
         type: ticket.name,
         sold: ticket.soldCount || 0,
         revenue: (ticket.soldCount || 0) * ticket.price,

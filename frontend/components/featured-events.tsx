@@ -10,7 +10,7 @@ import eventsData from '@/data/events.json'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export function FeaturedEvents() {
+export default function FeaturedEvents() {
   // Get featured events from all categories
   const getFeaturedEvents = () => {
     const allEvents: any[] = []

@@ -25,7 +25,7 @@ export class NotificationService {
     bookingData: any,
     attendeeEmails: string[]
   ): Promise<{ success: string[]; failed: string[] }> {
-    const results = { success: [], failed: [] }
+    const results: { success: string[]; failed: string[] } = { success: [], failed: [] }
 
     for (const email of attendeeEmails) {
       try {
@@ -62,7 +62,7 @@ export class NotificationService {
     try {
       const attendeeEmails = Array.from(
         new Set(bookingData.attendees.map((attendee: any) => attendee.email))
-      )
+      ) as string[]
 
       for (const email of attendeeEmails) {
         const notificationData: NotificationData = {
@@ -92,7 +92,7 @@ export class NotificationService {
     updateMessage: string,
     attendeeEmails: string[]
   ): Promise<{ success: string[]; failed: string[] }> {
-    const results = { success: [], failed: [] }
+    const results: { success: string[]; failed: string[] } = { success: [], failed: [] }
 
     for (const email of attendeeEmails) {
       try {

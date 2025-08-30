@@ -81,7 +81,7 @@ export default function AboutPage() {
                 About Elite Events
               </h1>
               <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-                We're revolutionizing how people discover, participate in, and organize events. 
+                We&apos;re revolutionizing how people discover, participate in, and organize events.
                 Our platform connects passionate individuals with amazing opportunities across technical, 
                 entertainment, business, and sports categories.
               </p>
@@ -130,7 +130,7 @@ export default function AboutPage() {
                 </p>
                 <p className="text-white/80 text-lg leading-relaxed mb-8">
                   We believe that the best experiences happen when people come together, 
-                  and we're here to make sure no one misses out on amazing opportunities.
+                  and we&apos;re here to make sure no one misses out on amazing opportunities.
                 </p>
                 <Link href="/events">
                   <Button variant="cyber" size="lg">
@@ -147,7 +147,7 @@ export default function AboutPage() {
               >
                 <h3 className="text-2xl font-bold text-white mb-6">Why Choose Elite Events?</h3>
                 <div className="space-y-4">
-                  {features.map((feature, index) => {
+                  {features.map((feature) => {
                     const IconComponent = feature.icon
                     return (
                       <div key={feature.title} className="flex items-start space-x-4">
@@ -176,7 +176,7 @@ export default function AboutPage() {
             >
               <h2 className="text-4xl font-bold gradient-text mb-6">Meet Our Team</h2>
               <p className="text-white/80 text-lg max-w-2xl mx-auto">
-                We're a passionate group of professionals dedicated to 
+                We&apos;re a passionate group of professionals dedicated to
                 making event discovery and participation more engaging and connected.
               </p>
             </motion.div>

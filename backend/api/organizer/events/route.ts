@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
             }
             
             // Update ticket types with sold counts
-            ticketTypesWithSales = event.ticketTypes.map(ticket => {
+            ticketTypesWithSales = event.ticketTypes.map((ticket: any) => {
               // For now, distribute sales proportionally
               const proportion = ticket.maxTickets / event.maxCapacity
               const estimatedSold = Math.floor(totalRegistrations * proportion)
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
             // For demo purposes, add some sample registrations
             totalRegistrations = Math.floor(Math.random() * (event.maxCapacity * 0.8)) + 5
             
-            ticketTypesWithSales = event.ticketTypes.map(ticket => {
+            ticketTypesWithSales = event.ticketTypes.map((ticket: any) => {
               const proportion = ticket.maxTickets / event.maxCapacity
               const estimatedSold = Math.floor(totalRegistrations * proportion)
               return {

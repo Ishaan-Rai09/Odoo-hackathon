@@ -67,7 +67,8 @@ export async function GET(
     // Add attendee tickets
     let yPosition = 100
     
-    for (const [index, attendee] of attendeeRows.entries()) {
+    for (let index = 0; index < attendeeRows.length; index++) {
+      const attendee = attendeeRows[index]
       // Start a new page if needed
       if (index > 0 && yPosition > 250) {
         pdf.addPage()

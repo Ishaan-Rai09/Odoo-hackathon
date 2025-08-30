@@ -3,10 +3,10 @@ import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import crypto from 'crypto'
 import mysqlPool from '@/database/connections/mysql'
-import { RowDataPacket, ResultSetHeader } from 'mysql2'
+import { RowDataPacket } from 'mysql2'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key'
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
+const JWT_SECRET: string = process.env.JWT_SECRET || 'your-super-secret-jwt-key'
+const JWT_EXPIRES_IN: string = process.env.JWT_EXPIRES_IN || '7d'
 const SALT_ROUNDS = 12
 
 export interface User {
@@ -16,6 +16,7 @@ export interface User {
   phone?: string
   emailVerified: boolean
   status: 'active' | 'inactive' | 'suspended'
+  role?: string
   createdAt: Date
   lastLogin?: Date
 }
@@ -53,7 +54,7 @@ export class AuthService {
 
   // Generate JWT token
   static generateToken(userId: string): string {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions)
   }
 
   // Verify JWT token
@@ -133,8 +134,8 @@ export class AuthService {
         message: 'Account created successfully'
       }
 
-    } catch (error) {
-      console.error('Sign up error:', error)
+    } catch (err) {
+      console.error('Sign up error:', err)
       return {
         success: false,
         error: 'Failed to create account'

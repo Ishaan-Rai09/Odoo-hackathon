@@ -22,7 +22,7 @@ interface TicketSelection {
   vip: number
 }
 
-export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
+export default function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
   const { user, loading } = useAuth()
   const [tickets, setTickets] = useState<TicketSelection>({ standard: 0, vip: 0 })
   const [showAttendeeForm, setShowAttendeeForm] = useState(false)

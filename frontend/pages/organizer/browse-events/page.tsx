@@ -108,7 +108,7 @@ export default function BrowseEventsPage() {
     setFilteredEvents(filtered)
   }
 
-  const categories = [...new Set(events.map(event => event.category))].filter(Boolean)
+  const categories = Array.from(new Set(events.map(event => event.category))).filter(Boolean)
 
   if (isLoading) {
     return (

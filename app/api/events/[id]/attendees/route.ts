@@ -16,9 +16,9 @@ async function getOrganizerFromRequest(request: NextRequest) {
       return null
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as any
+    const decoded = jwt.verify(token, JWT_SECRET) as { organizerId: string }
     return decoded.organizerId
-  } catch (error) {
+  } catch (err) {
     return null
   }
 }
@@ -43,7 +43,17 @@ export async function GET(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 })
     }
 
-    let attendees = []
+    let attendees: Array<{
+      id: string;
+      name: string;
+      email: string;
+      phone: string;
+      ticketType: string;
+      bookingDate: Date;
+      checkedIn: boolean;
+      checkinTime?: Date;
+      qrCode: string;
+    }> = []
 
     // Try to fetch attendee data from MySQL
     try {
@@ -66,7 +76,7 @@ export async function GET(
         ORDER BY b.created_at DESC
       `, [id, id])
 
-      attendees = attendeeRows.map((row: any) => ({
+      attendees = attendeeRows.map((row) => ({
         id: row.id,
         name: row.name,
         email: row.email,

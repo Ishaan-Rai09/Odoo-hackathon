@@ -7,9 +7,7 @@ const pool = mysql.createPool({
   database: process.env.MYSQL_DATABASE || 'elite_events',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0,
-  acquireTimeout: 60000,
-  timeout: 60000,
+  queueLimit: 0
 })
 
 // Create tables if they don't exist

@@ -10,6 +10,7 @@ export interface User {
   phone?: string
   emailVerified: boolean
   status: 'active' | 'inactive' | 'suspended'
+  role?: string
   createdAt: Date
   lastLogin?: Date
 }

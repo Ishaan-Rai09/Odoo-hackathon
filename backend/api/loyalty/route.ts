@@ -102,7 +102,6 @@ export async function POST(request: NextRequest) {
         }
 
         return NextResponse.json({
-          success: true,
           ...redeemResult,
           message: `Successfully redeemed $${redeemResult.discountAmount.toFixed(2)} credit!`
         })

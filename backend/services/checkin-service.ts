@@ -324,7 +324,7 @@ export class CheckInService {
     }> = []
 
     // Search through existing check-ins
-    for (const [ticketNumber, checkIn] of this.checkIns.entries()) {
+    for (const [ticketNumber, checkIn] of Array.from(this.checkIns.entries())) {
       if (checkIn.eventId === eventId && 
           (checkIn.attendeeName.toLowerCase().includes(query.toLowerCase()) ||
            ticketNumber.includes(query.toUpperCase()))) {

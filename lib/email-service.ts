@@ -94,7 +94,7 @@ export class EmailService {
     booking: BookingData,
     ticketPDF: Uint8Array
   ): Promise<{ success: string[]; failed: string[] }> {
-    const results = { success: [], failed: [] }
+    const results: { success: string[]; failed: string[] } = { success: [], failed: [] }
     
     // Get unique email addresses from attendees
     const emailAddresses = Array.from(

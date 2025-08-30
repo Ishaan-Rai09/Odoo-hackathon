@@ -15,7 +15,7 @@ interface EventFormProps {
   event?: any
 }
 
-export function EventForm({ isOpen, onClose, event }: EventFormProps) {
+export default function EventForm({ isOpen, onClose, event }: EventFormProps) {
   const { toast } = useToast()
   const [formData, setFormData] = useState({
     title: '',
