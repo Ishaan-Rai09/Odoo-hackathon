@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs'
+import { validateToken } from '@/lib/auth-utils'
 import { connectToDatabase } from '@/database/connections/mongodb'
 import Booking from '@/database/models/Booking'
 import mysqlPool, { initializeDatabase } from '@/database/connections/mysql'
@@ -8,11 +8,13 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2'
 // GET /api/bookings - Get user's bookings
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = auth()
+    const authResult = validateToken(request)
     
-    if (!userId) {
+    if (!authResult) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    
+    const { userId } = authResult
 
     // Try MySQL first, fallback to MongoDB
     try {
@@ -126,11 +128,13 @@ export async function GET(request: NextRequest) {
 // POST /api/bookings - Create a new booking
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = auth()
+    const authResult = validateToken(request)
     
-    if (!userId) {
+    if (!authResult) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    
+    const { userId } = authResult
 
     const bookingData = await request.json()
     console.log('📝 Creating new booking:', bookingData.bookingId)
@@ -259,11 +263,13 @@ export async function POST(request: NextRequest) {
 // DELETE /api/bookings/[id] - Cancel a booking
 export async function DELETE(request: NextRequest) {
   try {
-    const { userId } = auth()
+    const authResult = validateToken(request)
     
-    if (!userId) {
+    if (!authResult) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    
+    const { userId } = authResult
 
     const { searchParams } = new URL(request.url)
     const bookingId = searchParams.get('bookingId')

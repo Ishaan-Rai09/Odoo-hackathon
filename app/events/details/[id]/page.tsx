@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -74,7 +74,7 @@ interface EventDetails {
 export default function EventDetailsPage() {
   const params = useParams()
   const eventId = params?.id as string
-  const { isSignedIn, isLoaded } = useUser()
+  const { user, loading: authLoading } = useAuth()
   
   const [event, setEvent] = useState<EventDetails | null>(null)
   const [loading, setLoading] = useState(true)
@@ -115,12 +115,12 @@ export default function EventDetailsPage() {
   } : null
 
   const handleBookTickets = () => {
-    if (!isLoaded) {
+    if (authLoading) {
       // Still loading auth state, do nothing
       return
     }
     
-    if (!isSignedIn) {
+    if (!user) {
       // User is not signed in, show sign-in prompt
       setShowSignInPrompt(true)
       return
@@ -458,9 +458,9 @@ export default function EventDetailsPage() {
                         className="w-full" 
                         size="lg" 
                         onClick={handleBookTickets}
-                        disabled={!isLoaded}
+                        disabled={authLoading}
                       >
-                        {!isLoaded ? (
+                        {authLoading ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             Loading...

@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth, useUser } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { redirect } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
@@ -8,10 +8,9 @@ import { Navbar } from '@/components/navbar'
 import ReferralSystem from '@/components/referral-system'
 
 export default function ReferralPage() {
-  const { isLoaded, isSignedIn } = useAuth()
-  const { user } = useUser()
+  const { user, loading } = useAuth()
 
-  if (!isLoaded) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-black cyber-grid">
         <Navbar />
@@ -28,7 +27,7 @@ export default function ReferralPage() {
     )
   }
 
-  if (!isSignedIn) {
+  if (!user) {
     redirect('/sign-in?redirectUrl=/referral')
   }
 
@@ -45,7 +44,7 @@ export default function ReferralPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ReferralSystem 
             userId={user?.id || ''} 
-            userEmail={user?.emailAddresses[0]?.emailAddress || ''} 
+            userEmail={user?.email || ''} 
           />
         </div>
       </motion.main>

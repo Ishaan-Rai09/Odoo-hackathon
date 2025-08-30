@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -25,7 +25,7 @@ interface TicketSelection {
 }
 
 export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
-  const { isSignedIn, isLoaded, user } = useUser()
+  const { user, loading } = useAuth()
   const [tickets, setTickets] = useState<TicketSelection>({ standard: 0, vip: 0 })
   const [showAttendeeForm, setShowAttendeeForm] = useState(false)
   const [appliedDiscounts, setAppliedDiscounts] = useState<DiscountResult[]>([])
@@ -282,12 +282,12 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
           </AnimatePresence>
 
           {/* Authentication Check */}
-          {!isLoaded ? (
+          {loading ? (
             <div className="text-center py-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyber-blue mx-auto mb-2"></div>
               <p className="text-white/60">Loading...</p>
             </div>
-          ) : !isSignedIn ? (
+          ) : !user ? (
             <Card className="glassmorphism border-yellow-400/30 bg-yellow-400/5">
               <CardContent className="p-6 text-center">
                 <UserX className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
@@ -317,7 +317,7 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
         </div>
         
         {/* Action Buttons - Fixed at bottom */}
-        {isSignedIn && (
+        {user && (
           <div className="flex-shrink-0 flex gap-4 pt-6 border-t border-white/20 mt-4">
             <Button
               variant="outline"

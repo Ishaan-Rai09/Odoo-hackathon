@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UserButton, useUser } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { Button } from '@/components/ui/button'
-import { Menu, X, Search, Ticket, Settings } from 'lucide-react'
+import { Menu, X, Search, Ticket, Settings, User, LogOut } from 'lucide-react'
 import Link from 'next/link'
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const { isSignedIn } = useUser()
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const { user, signOut } = useAuth()
 
   useEffect(() => {
     setMounted(true)
@@ -85,7 +86,7 @@ export function Navbar() {
             </motion.div>
 
             {/* My Bookings - Only show when signed in */}
-            {mounted && isSignedIn && (
+            {mounted && user && (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/my-bookings">
                   <Button variant="outline" className="text-sm border-cyber-blue/30 text-cyber-blue hover:bg-cyber-blue/10">
@@ -108,14 +109,47 @@ export function Navbar() {
 
             {/* Auth */}
             {mounted ? (
-              isSignedIn ? (
-                <UserButton 
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-8 h-8"
-                    }
-                  }}
-                />
+              user ? (
+                <div className="relative">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center space-x-2 p-2 rounded-full border border-white/20 hover:border-white/40 transition-colors"
+                  >
+                    <div className="w-6 h-6 bg-gradient-to-r from-cyber-blue to-cyber-pink rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-white text-sm font-medium">{user.name}</span>
+                  </motion.button>
+                  
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-md border border-white/10 rounded-lg shadow-lg z-50">
+                      <div className="py-1">
+                        <div className="px-4 py-2 text-xs text-white/60 border-b border-white/10">
+                          {user.email}
+                        </div>
+                        <Link
+                          href="/dashboard"
+                          className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <button
+                          onClick={() => {
+                            signOut()
+                            setShowUserMenu(false)
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors flex items-center"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link href="/sign-in">
@@ -178,7 +212,7 @@ export function Navbar() {
               ))}
               
               {/* My Bookings - Mobile */}
-              {mounted && isSignedIn && (
+              {mounted && user && (
                 <motion.div
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
@@ -211,10 +245,31 @@ export function Navbar() {
                 </Link>
               </motion.div>
               
-              <div className="flex items-center space-x-4 px-3 py-2">
+              <div className="flex flex-col space-y-2 px-3 py-2">
                 {mounted ? (
-                  isSignedIn ? (
-                    <UserButton />
+                  user ? (
+                    <>
+                      <div className="text-white/80 text-sm mb-2">
+                        Signed in as {user.name}
+                      </div>
+                      <Link
+                        href="/dashboard"
+                        className="text-white hover:text-white/80 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={() => {
+                          signOut()
+                          setIsOpen(false)
+                        }}
+                        className="text-left text-white hover:text-white/80 block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </button>
+                    </>
                   ) : (
                     <Link href="/sign-in">
                       <Button variant="outline" className="text-sm border-white/20 text-white hover:bg-white/10">

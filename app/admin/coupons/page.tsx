@@ -1,13 +1,13 @@
 'use client'
 
-import { useAuth } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { redirect } from 'next/navigation'
 import CouponManagement from '@/components/admin/coupon-management'
 
 export default function AdminCouponsPage() {
-  const { isLoaded, isSignedIn, userId } = useAuth()
+  const { user, loading } = useAuth()
 
-  if (!isLoaded) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -15,7 +15,7 @@ export default function AdminCouponsPage() {
     )
   }
 
-  if (!isSignedIn) {
+  if (!user) {
     redirect('/sign-in?redirectUrl=/admin/coupons')
   }
 

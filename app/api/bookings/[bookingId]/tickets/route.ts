@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs'
+import { validateToken } from '@/lib/auth-utils'
 import mysqlPool from '@/database/connections/mysql'
 import { RowDataPacket } from 'mysql2'
 import { jsPDF } from 'jspdf'
@@ -10,11 +10,13 @@ export async function GET(
   { params }: { params: { bookingId: string } }
 ) {
   try {
-    const { userId } = auth()
+    const authResult = validateToken(request)
     
-    if (!userId) {
+    if (!authResult) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    
+    const { userId } = authResult
 
     const { bookingId } = params
     

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { ClerkProvider } from '@clerk/nextjs'
+import { AuthProvider } from '@/lib/auth/auth-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { FloatingActionButton } from '@/components/floating-action-button'
@@ -27,30 +27,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: undefined,
-        variables: {
-          colorPrimary: '#00ffff',
-          colorBackground: '#0a0a0a',
-          colorInputBackground: 'rgba(255, 255, 255, 0.05)',
-          colorInputText: '#ffffff',
-          colorText: '#ffffff',
-          colorTextSecondary: 'rgba(255, 255, 255, 0.8)',
-        },
-        elements: {
-          formButtonPrimary: 'cyber-button',
-          card: 'glassmorphism bg-black/80 backdrop-blur-md border border-white/20',
-          userButtonPopoverCard: 'bg-black/90 backdrop-blur-md border border-white/20',
-          userButtonPopoverActionButton: 'text-white hover:bg-white/10',
-          userButtonPopoverActionButtonText: 'text-white',
-          userButtonPopoverFooter: 'hidden',
-          userPreviewTextContainer: 'text-white',
-          userPreviewMainIdentifier: 'text-white',
-          userPreviewSecondaryIdentifier: 'text-white/80',
-        },
-      }}
-    >
+    <AuthProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={`${inter.className} min-h-screen bg-black text-white overflow-x-hidden`}>
           <ThemeProvider
@@ -68,6 +45,6 @@ export default function RootLayout({
           </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
+    </AuthProvider>
   )
 }

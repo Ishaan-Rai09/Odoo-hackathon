@@ -6,8 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
-import { useUser } from '@clerk/nextjs'
-import { 
+import { useAuth } from '@/lib/auth/auth-context'
+import {
   CreditCard, 
   CheckCircle, 
   XCircle, 
@@ -53,7 +53,7 @@ export function PaymentPopup({
   onBack 
 }: PaymentPopupProps) {
   const { toast } = useToast()
-  const { user } = useUser()
+  const { user } = useAuth()
   const [stage, setStage] = useState<PaymentStage>('payment')
   const [paymentMethod, setPaymentMethod] = useState('credit_card')
   const [bookingData, setBookingData] = useState<BookingData | null>(null)
@@ -138,7 +138,7 @@ export function PaymentPopup({
           booking,
           qrCodes,
           user.id,
-          user.primaryEmailAddress?.emailAddress || attendees[0].email
+          user.email || attendees[0].email
         )
         
         if (saved) {

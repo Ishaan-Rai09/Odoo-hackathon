@@ -12,7 +12,7 @@ export async function GET(
 
     // Get event data from MongoDB
     await connectToDatabase()
-    const event = await Event.findById(id)
+    const event = await Event.findOne({ slug: id })
 
     if (!event) {
       return NextResponse.json(

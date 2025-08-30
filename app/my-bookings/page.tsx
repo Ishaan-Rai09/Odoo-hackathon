@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -64,7 +64,7 @@ interface BookingData {
 }
 
 export default function MyBookingsPage() {
-  const { isSignedIn, user, isLoaded } = useUser()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
   const [bookings, setBookings] = useState<BookingData[]>([])
@@ -76,7 +76,7 @@ export default function MyBookingsPage() {
   // Fetch user's real bookings from API
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!isSignedIn || !user) return
+      if (!user) return
       
       try {
         setLoading(true)
@@ -100,9 +100,9 @@ export default function MyBookingsPage() {
     }
 
     fetchBookings()
-  }, [isSignedIn, user])
+  }, [user])
 
-  if (!isLoaded) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-black cyber-grid flex items-center justify-center">
         <div className="text-center">
@@ -113,7 +113,7 @@ export default function MyBookingsPage() {
     )
   }
 
-  if (!isSignedIn) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-black cyber-grid">
         <Navbar />
