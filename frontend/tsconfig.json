@@ -6,7 +6,8 @@
     "declaration": true,
     "declarationMap": true,
     "composite": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "noEmit": false
   },
   "include": [
     "./**/*"
