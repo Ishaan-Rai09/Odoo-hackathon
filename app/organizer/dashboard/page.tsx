@@ -51,32 +51,26 @@ export default function OrganizerDashboard() {
       return
     }
 
-    // TODO: Fetch organizer's events from API
-    // For now, using mock data
-    const mockEvents = [
-      {
-        id: '1',
-        name: 'Tech Conference 2024',
-        startDate: '2024-04-15',
-        category: 'technical',
-        totalRegistrations: 156,
-        maxCapacity: 200,
-        status: 'published',
-        revenue: 7800
-      },
-      {
-        id: '2',
-        name: 'Music Festival',
-        startDate: '2024-04-22',
-        category: 'entertainment',
-        totalRegistrations: 89,
-        maxCapacity: 150,
-        status: 'draft',
-        revenue: 2670
+    // Fetch organizer's events from API
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/organizer/events')
+        if (response.ok) {
+          const data = await response.json()
+          setEvents(data.events || [])
+        } else {
+          console.error('Failed to fetch events')
+          setEvents([])
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error)
+        setEvents([])
+      } finally {
+        setIsLoading(false)
       }
-    ]
-    setEvents(mockEvents as any)
-    setIsLoading(false)
+    }
+    
+    fetchEvents()
   }, [router])
 
   const handleSignOut = () => {
@@ -99,9 +93,11 @@ export default function OrganizerDashboard() {
   // Calculate stats
   const stats = {
     totalEvents: events.length,
-    totalRegistrations: events.reduce((sum: number, event: any) => sum + event.totalRegistrations, 0),
-    totalRevenue: events.reduce((sum: number, event: any) => sum + event.revenue, 0),
-    avgFillRate: Math.round(events.reduce((sum: number, event: any) => sum + (event.totalRegistrations / event.maxCapacity * 100), 0) / events.length)
+    totalRegistrations: events.reduce((sum: number, event: any) => sum + (event.totalRegistrations || 0), 0),
+    totalRevenue: events.reduce((sum: number, event: any) => {
+      return sum + (event.ticketTypes?.reduce((ticketSum: number, ticket: any) => ticketSum + (ticket.price * (ticket.soldCount || 0)), 0) || 0)
+    }, 0),
+    avgFillRate: events.length > 0 ? Math.round(events.reduce((sum: number, event: any) => sum + ((event.totalRegistrations || 0) / event.maxCapacity * 100), 0) / events.length) : 0
   }
 
   return (
@@ -290,12 +286,12 @@ export default function OrganizerDashboard() {
                           </h3>
                           <Badge 
                             className={
-                              event.status === 'published' 
+                              event.isPublished 
                                 ? "bg-green-500/20 text-green-400 border-green-500/30"
                                 : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
                             }
                           >
-                            {event.status === 'published' ? 'Published' : 'Draft'}
+                            {event.isPublished ? 'Published' : 'Draft'}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-white/60 mb-3">
@@ -305,11 +301,11 @@ export default function OrganizerDashboard() {
                           </span>
                           <span className="flex items-center">
                             <Users className="h-4 w-4 mr-1" />
-                            {event.totalRegistrations}/{event.maxCapacity} registered
+                            {event.totalRegistrations || 0}/{event.maxCapacity} registered
                           </span>
                           <span className="flex items-center">
                             <DollarSign className="h-4 w-4 mr-1" />
-                            ${event.revenue.toLocaleString()} revenue
+                            ${(event.ticketTypes?.reduce((sum: number, ticket: any) => sum + (ticket.price * ticket.soldCount), 0) || 0).toLocaleString()} revenue
                           </span>
                         </div>
                         
