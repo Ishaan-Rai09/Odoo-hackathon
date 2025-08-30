@@ -3,6 +3,8 @@ import { connectToDatabase } from '@/database/connections/mongodb'
 import Event from '@/database/models/Event'
 import Organizer from '@/database/models/Organizer'
 
+export const runtime = 'nodejs'
+
 // Static events data (matching the IDs from featured events JSON)
 const staticEvents = [
   {
