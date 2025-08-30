@@ -185,7 +185,7 @@ export default function Dashboard() {
                     <div className="flex items-center space-x-3">
                       <Calendar className="h-4 w-4 text-purple-400" />
                       <span className="text-white/80">
-                        Joined {user.createdAt.toLocaleDateString()}
+                        Joined {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently'}
                       </span>
                     </div>
 
@@ -193,7 +193,7 @@ export default function Dashboard() {
                       <div className="flex items-center space-x-3">
                         <Activity className="h-4 w-4 text-yellow-400" />
                         <span className="text-white/80">
-                          Last login: {user.lastLogin.toLocaleDateString()}
+                          Last login: {new Date(user.lastLogin).toLocaleDateString()}
                         </span>
                       </div>
                     )}
