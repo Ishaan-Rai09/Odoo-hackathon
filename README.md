@@ -67,9 +67,6 @@ A modern, luxurious college event listing website with cyberpunk + Apple aesthet
    # Clerk Authentication
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
    CLERK_SECRET_KEY=sk_test_your_key_here
-   
-   # College domain for email restriction
-   NEXT_PUBLIC_COLLEGE_DOMAIN=yourcollege.edu
    ```
 
 4. **Configure Clerk**
