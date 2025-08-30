@@ -1,0 +1,32 @@
+{
+  "name": "@elite-events/backend",
+  "version": "1.0.0",
+  "description": "Backend API and services for Elite Events Platform",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^4.29.1",
+    "@elite-events/database": "file:../database",
+    "next": "^14.2.32",
+    "@types/nodemailer": "^7.0.1",
+    "@types/qrcode": "^1.5.5",
+    "@types/uuid": "^10.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.2",
+    "nodemailer": "^7.0.5",
+    "qrcode": "^1.5.4",
+    "uuid": "^11.1.0",
+    "html2canvas": "^1.4.1"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20",
+    "typescript": "^5",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0"
+  }
+}

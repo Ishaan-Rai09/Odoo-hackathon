@@ -28,7 +28,7 @@ import {
   Target
 } from 'lucide-react'
 import Link from 'next/link'
-import { AnalyticsService } from '@/lib/analytics-service'
+// Analytics service replaced with mock data for now
 
 interface EventAnalytics {
   eventId: string
@@ -72,11 +72,24 @@ export default function EventAnalyticsPage() {
   const loadAnalytics = async () => {
     setLoading(true)
     try {
-      // Get analytics data
-      const analyticsData = await AnalyticsService.getEventAnalytics(eventId, selectedTimeframe)
-      setAnalytics(analyticsData)
+      const response = await fetch(`/api/analytics/${eventId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to load analytics: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setAnalytics(data.analytics)
     } catch (error) {
       console.error('Error loading analytics:', error)
+      // Fallback to basic event data without analytics
+      setAnalytics(null)
     } finally {
       setLoading(false)
     }
@@ -84,7 +97,25 @@ export default function EventAnalyticsPage() {
 
   const handleExportReport = async () => {
     try {
-      const csvData = await AnalyticsService.exportEventReport(eventId, 'csv')
+      if (!analytics) return
+      
+      // Generate mock CSV data
+      const csvData = `Event Analytics Report
+Event ID,${analytics.eventId}
+Event Name,${analytics.eventName}
+Total Bookings,${analytics.totalBookings}
+Total Revenue,$${analytics.totalRevenue}
+Total Attendees,${analytics.totalAttendees}
+Check-in Rate,${((analytics.checkedInCount / analytics.totalAttendees) * 100).toFixed(1)}%
+
+Daily Bookings
+Date,Bookings,Revenue
+${analytics.dailyBookings.map(day => `${day.date},${day.bookings},$${day.revenue}`).join('\n')}
+
+Ticket Type Stats
+Type,Sold,Capacity,Revenue
+${analytics.ticketTypeStats.map(ticket => `${ticket.type},${ticket.sold},${ticket.capacity},$${ticket.revenue}`).join('\n')}
+`
       
       // Create download link
       const blob = new Blob([csvData], { type: 'text/csv' })

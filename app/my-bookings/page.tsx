@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useToast } from '@/components/ui/use-toast'
 import { 
   Calendar, 
   Clock, 
@@ -18,13 +21,17 @@ import {
   Phone,
   QrCode,
   ArrowLeft,
-  FileText
+  FileText,
+  X,
+  ExternalLink
 } from 'lucide-react'
 import Link from 'next/link'
+import { QRCodeSVG } from 'qrcode.react'
 
 interface BookingData {
   _id: string
   bookingId: string
+  eventId?: string
   eventTitle: string
   eventDate: string
   eventTime: string
@@ -58,9 +65,13 @@ interface BookingData {
 
 export default function MyBookingsPage() {
   const { isSignedIn, user, isLoaded } = useUser()
+  const router = useRouter()
+  const { toast } = useToast()
   const [bookings, setBookings] = useState<BookingData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showQRModal, setShowQRModal] = useState(false)
+  const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null)
 
   // Fetch user's real bookings from API
   useEffect(() => {
@@ -139,31 +150,60 @@ export default function MyBookingsPage() {
 
   const downloadTickets = async (booking: BookingData) => {
     try {
-      // In a real app, this would fetch the PDF from storage or regenerate it
-      console.log(`Downloading tickets for booking: ${booking.bookingId}`)
-      
-      // For now, show a toast with booking info
-      alert(`Download would start for:\nBooking ID: ${booking.bookingId}\nEvent: ${booking.eventTitle}\nTickets: ${booking.tickets.standard + booking.tickets.vip}`)
+      toast({
+        title: "Generating Tickets",
+        description: "Please wait while we generate your PDF tickets..."
+      })
+
+      // Call the API to generate PDF tickets
+      const response = await fetch(`/api/bookings/${booking.bookingId}/tickets`, {
+        method: 'GET',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate tickets')
+      }
+
+      // Get the PDF blob and download it
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.style.display = 'none'
+      a.href = url
+      a.download = `tickets-${booking.bookingId}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      toast({
+        title: "Success",
+        description: "Your tickets have been downloaded successfully!"
+      })
       
     } catch (error) {
       console.error('Error downloading tickets:', error)
-      alert('Failed to download tickets. Please try again.')
+      toast({
+        title: "Download Failed",
+        description: "Failed to download tickets. Please try again.",
+        variant: "destructive"
+      })
     }
   }
   
   const showQRCodes = (booking: BookingData) => {
-    if (booking.qrCodes && booking.qrCodes.length > 0) {
-      // In a real app, this would open a modal with QR codes
-      alert(`QR Codes available for ${booking.qrCodes.length} tickets`)
-    } else {
-      alert('QR codes are not available for this booking')
-    }
+    setSelectedBooking(booking)
+    setShowQRModal(true)
   }
   
   const viewDetails = (booking: BookingData) => {
-    // In a real app, this would open a detailed view modal
-    const details = `Booking Details:\n\nBooking ID: ${booking.bookingId}\nEvent: ${booking.eventTitle}\nDate: ${new Date(booking.eventDate).toLocaleDateString()}\nVenue: ${booking.eventVenue}\nTotal: $${booking.totalAmount}\nStatus: ${booking.status}\n\nAttendees: ${booking.attendees.length}\nTransaction ID: ${booking.paymentDetails.transactionId}`
-    alert(details)
+    // Navigate to the event details page using the event ID if available
+    if (booking.eventId) {
+      router.push(`/events/details/${booking.eventId}`)
+    } else {
+      // Fallback to events list with search
+      router.push(`/events?search=${encodeURIComponent(booking.eventTitle)}`)
+    }
   }
 
   return (
@@ -366,6 +406,90 @@ export default function MyBookingsPage() {
           </div>
         </section>
       </main>
+
+      {/* QR Code Modal */}
+      <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
+        <DialogContent className="glassmorphism border-white/20 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center">
+              <QrCode className="h-5 w-5 mr-2" />
+              QR Codes - {selectedBooking?.eventTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 max-h-96 overflow-y-auto">
+            {selectedBooking?.attendees.map((attendee, index) => {
+              // Generate a unique QR code for each attendee
+              const qrData = JSON.stringify({
+                bookingId: selectedBooking.bookingId,
+                attendeeName: attendee.name,
+                eventTitle: selectedBooking.eventTitle,
+                ticketType: attendee.ticketType,
+                eventDate: selectedBooking.eventDate,
+                eventTime: selectedBooking.eventTime
+              })
+              
+              return (
+                <div key={index} className="border border-white/20 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-white font-medium">{attendee.name}</h3>
+                      <p className="text-white/60 text-sm">{attendee.email}</p>
+                      <Badge className={`mt-1 ${
+                        attendee.ticketType === 'vip' 
+                          ? 'bg-yellow-400/20 text-yellow-400 border-yellow-500/30' 
+                          : 'bg-cyber-blue/20 text-cyber-blue border-cyber-blue/30'
+                      }`}>
+                        {attendee.ticketType.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <div className="text-center">
+                      <div className="bg-white p-2 rounded-lg">
+                        <QRCodeSVG 
+                          value={qrData}
+                          size={120}
+                          bgColor="#ffffff"
+                          fgColor="#000000"
+                          level="M"
+                          includeMargin={true}
+                        />
+                      </div>
+                      <p className="text-xs text-white/60 mt-2">Ticket #{index + 1}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-white/60">Event:</span>
+                      <p className="text-white truncate">{selectedBooking.eventTitle}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60">Date:</span>
+                      <p className="text-white">{new Date(selectedBooking.eventDate).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60">Time:</span>
+                      <p className="text-white">{selectedBooking.eventTime}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60">Venue:</span>
+                      <p className="text-white truncate">{selectedBooking.eventVenue}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div className="flex justify-end mt-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowQRModal(false)}
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

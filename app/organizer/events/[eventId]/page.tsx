@@ -36,6 +36,35 @@ import { useToast } from '@/components/ui/use-toast'
 import { CheckInService } from '@/lib/checkin-service'
 import { QRScanner } from '@/components/qr-scanner'
 
+// Helper function to get appropriate cover image based on category
+const getCoverImageForCategory = (category: string, existingImage?: string): string => {
+  if (existingImage && existingImage.trim() !== '') {
+    return existingImage
+  }
+  
+  const categoryImages: Record<string, string> = {
+    'comedy': 'https://images.unsplash.com/photo-1585699244537-6dd558d97da3?w=800&h=400&fit=crop&crop=center',
+    'stand-up-comedy': 'https://images.unsplash.com/photo-1585699244537-6dd558d97da3?w=800&h=400&fit=crop&crop=center',
+    'music': 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=400&fit=crop&crop=center',
+    'concert': 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=400&fit=crop&crop=center',
+    'tech': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop&crop=center',
+    'technical': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop&crop=center',
+    'technology': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop&crop=center',
+    'workshop': 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=400&fit=crop&crop=center',
+    'conference': 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=400&fit=crop&crop=center',
+    'business': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop&crop=center',
+    'sports': 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&h=400&fit=crop&crop=center',
+    'fitness': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop&crop=center',
+    'art': 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=400&fit=crop&crop=center',
+    'culture': 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=400&fit=crop&crop=center',
+    'food': 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=400&fit=crop&crop=center',
+    'networking': 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&h=400&fit=crop&crop=center'
+  }
+  
+  const normalizedCategory = category.toLowerCase().replace(/[\s-_]+/g, '-')
+  return categoryImages[normalizedCategory] || categoryImages['conference'] || 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=400&fit=crop&crop=center'
+}
+
 interface EventDetails {
   id: string
   name: string
@@ -95,28 +124,49 @@ export default function EventDetailsPage() {
 
   const loadEventDetails = async () => {
     try {
-      // Mock event details - in real app, fetch from API
-      const mockEvent: EventDetails = {
-        id: eventId,
-        name: 'AI & Machine Learning Workshop',
-        description: 'Learn the fundamentals of artificial intelligence and machine learning with hands-on projects.',
-        category: 'technical',
-        startDate: '2024-09-15T10:00:00Z',
-        endDate: '2024-09-15T16:00:00Z',
-        location: {
-          name: 'Computer Science Building',
-          address: '123 University Ave, Campus'
+      console.log('Loading event details for ID:', eventId)
+      const response = await fetch(`/api/organizer/events?id=${eventId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        ticketTypes: [
-          { name: 'Regular', price: 25, maxTickets: 50, soldCount: 32 },
-          { name: 'Student', price: 15, maxTickets: 30, soldCount: 18 }
-        ],
-        totalRegistrations: 50,
-        maxCapacity: 80,
-        isPublished: true,
-        coverImage: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800'
+      })
+
+      console.log('Response status:', response.status)
+      
+      if (response.ok) {
+        const data = await response.json()
+        console.log('API Response data:', data)
+        
+        if (data.event) {
+          const eventData = data.event
+          
+          // Map MongoDB event to frontend format
+          const mappedEvent: EventDetails = {
+            id: eventData._id,
+            name: eventData.name,
+            description: eventData.description,
+            category: eventData.category,
+            startDate: eventData.startDate,
+            endDate: eventData.endDate,
+            location: eventData.location,
+            ticketTypes: eventData.ticketTypes,
+            totalRegistrations: eventData.totalRegistrations || 0,
+            maxCapacity: eventData.maxCapacity,
+            isPublished: eventData.isPublished,
+            coverImage: getCoverImageForCategory(eventData.category, eventData.coverImage)
+          }
+          
+          console.log('Mapped event:', mappedEvent)
+          setEvent(mappedEvent)
+        } else {
+          console.error('No event data in response:', data)
+        }
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to fetch event details:', response.status, errorData)
       }
-      setEvent(mockEvent)
     } catch (error) {
       console.error('Error loading event details:', error)
     } finally {
@@ -126,21 +176,24 @@ export default function EventDetailsPage() {
 
   const loadAttendees = async () => {
     try {
-      // Generate mock attendees
-      const mockAttendees: Attendee[] = Array.from({ length: 50 }, (_, i) => ({
-        id: `ATT-${i + 1}`,
-        name: `Attendee ${i + 1}`,
-        email: `attendee${i + 1}@example.com`,
-        phone: `+1555${String(i + 1).padStart(3, '0')}0000`,
-        ticketType: i < 32 ? 'Regular' : 'Student',
-        bookingDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-        checkedIn: Math.random() > 0.3, // 70% check-in rate
-        checkinTime: Math.random() > 0.3 ? new Date().toISOString() : undefined,
-        qrCode: `QR-${eventId}-${i + 1}`
-      }))
-      setAttendees(mockAttendees)
+      const response = await fetch(`/api/events/${eventId}/attendees`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setAttendees(data.attendees || [])
+      } else {
+        console.log('No attendees data available from API')
+        setAttendees([])
+      }
     } catch (error) {
       console.error('Error loading attendees:', error)
+      setAttendees([])
     }
   }
 
