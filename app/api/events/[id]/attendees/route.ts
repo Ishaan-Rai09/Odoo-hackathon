@@ -25,7 +25,7 @@ async function getOrganizerFromRequest(request: NextRequest) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     await dbConnect()
@@ -35,10 +35,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { eventId } = params
+    const { id } = params
     
     // Verify event exists and belongs to organizer
-    const event = await Event.findOne({ _id: eventId, organizer: organizerId })
+    const event = await Event.findOne({ _id: id, organizer: organizerId })
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 })
     }
@@ -64,7 +64,7 @@ export async function GET(
         JOIN bookings b ON a.booking_id = b.booking_id
         WHERE b.event_id = ? AND b.status != 'cancelled'
         ORDER BY b.created_at DESC
-      `, [eventId, eventId])
+      `, [id, id])
 
       attendees = attendeeRows.map((row: any) => ({
         id: row.id,

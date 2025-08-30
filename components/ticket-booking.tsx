@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { AttendeeDetailsForm } from '@/components/attendee-details-form'
+import DiscountInput, { DiscountResult } from '@/components/discount-input'
+import PromotionalBanners from '@/components/promotional-banners'
 import { Ticket, Users, Crown, ChevronDown, UserX } from 'lucide-react'
 import Link from 'next/link'
 
@@ -23,14 +25,17 @@ interface TicketSelection {
 }
 
 export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
-  const { isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoaded, user } = useUser()
   const [tickets, setTickets] = useState<TicketSelection>({ standard: 0, vip: 0 })
   const [showAttendeeForm, setShowAttendeeForm] = useState(false)
+  const [appliedDiscounts, setAppliedDiscounts] = useState<DiscountResult[]>([])
+  const [totalDiscount, setTotalDiscount] = useState(0)
 
   if (!event) return null
 
   const totalTickets = tickets.standard + tickets.vip
-  const totalPrice = (tickets.standard * event.standardPrice) + (tickets.vip * event.vipPrice)
+  const originalPrice = (tickets.standard * event.standardPrice) + (tickets.vip * event.vipPrice)
+  const totalPrice = Math.max(0, originalPrice - totalDiscount)
 
   const updateTicketCount = (type: 'standard' | 'vip', count: number) => {
     setTickets(prev => ({
@@ -48,7 +53,26 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
   const handleClose = () => {
     setTickets({ standard: 0, vip: 0 })
     setShowAttendeeForm(false)
+    setAppliedDiscounts([])
+    setTotalDiscount(0)
     onClose()
+  }
+
+  const handleDiscountApplied = (discount: DiscountResult) => {
+    setAppliedDiscounts(prev => [...prev, discount])
+    setTotalDiscount(prev => prev + discount.discountAmount)
+  }
+
+  const handleDiscountRemoved = () => {
+    // Recalculate total discount from applied discounts
+    const newTotal = appliedDiscounts.reduce((sum, discount) => sum + discount.discountAmount, 0)
+    setTotalDiscount(newTotal)
+  }
+
+  const handlePromotionalApply = (couponCode: string) => {
+    // This will trigger the discount input component to apply the code
+    // Implementation depends on how we want to handle promotional banner clicks
+    console.log('Applying promotional code:', couponCode)
   }
 
   if (showAttendeeForm) {
@@ -66,15 +90,15 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl bg-black/95 border border-white/20">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] bg-black/95 border border-white/20 flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-white flex items-center">
             <Ticket className="h-6 w-6 mr-3 text-cyber-blue" />
             Select Tickets
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto space-y-6 pr-2">
           {/* Event Info */}
           <div className="border-b border-white/20 pb-6">
             <h3 className="text-xl font-semibold text-white mb-2">{event.title}</h3>
@@ -84,6 +108,13 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
               <span>{event.venue}</span>
             </div>
           </div>
+
+          {/* Promotional Banners */}
+          <PromotionalBanners 
+            eventData={event}
+            totalTickets={totalTickets}
+            onDiscountApply={handlePromotionalApply}
+          />
 
           {/* Ticket Options */}
           <div className="space-y-4">
@@ -161,6 +192,18 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
             </Card>
           </div>
 
+          {/* Discount Input */}
+          {totalTickets > 0 && user && (
+            <DiscountInput
+              eventId={event.id}
+              userId={user.id}
+              orderAmount={originalPrice}
+              ticketTypes={{ standard: tickets.standard, vip: tickets.vip }}
+              onDiscountApplied={handleDiscountApplied}
+              onDiscountRemoved={handleDiscountRemoved}
+            />
+          )}
+
           {/* Ticket Limit Notice */}
           <div className="text-sm text-white/60 text-center">
             Maximum 10 tickets per booking
@@ -199,13 +242,37 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
                           </span>
                         </div>
                       )}
+                      
+                      {/* Show discount breakdown if any discounts applied */}
+                      {totalDiscount > 0 && (
+                        <>
+                          <div className="border-t border-white/20 pt-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-white/80">Subtotal</span>
+                              <span className="text-white font-medium">
+                                ${originalPrice.toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center text-green-400">
+                              <span>Discount</span>
+                              <span>-${totalDiscount.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      
                       <div className="border-t border-white/20 pt-3">
                         <div className="flex justify-between items-center">
                           <span className="text-lg font-semibold text-white">Total</span>
                           <span className="text-xl font-bold text-cyber-blue">
-                            {totalPrice === 0 ? 'Free' : `$${totalPrice}`}
+                            {totalPrice === 0 ? 'Free' : `$${totalPrice.toFixed(2)}`}
                           </span>
                         </div>
+                        {totalDiscount > 0 && (
+                          <div className="text-sm text-green-400 text-right mt-1">
+                            You saved ${totalDiscount.toFixed(2)}!
+                          </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -247,30 +314,31 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
             </Card>
           ) : null}
 
-          {/* Action Buttons - Only show when authenticated */}
-          {isSignedIn && (
-            <div className="flex gap-4 pt-6 border-t border-white/20">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleClose}
-                className="flex-1 border-white/20 text-white hover:bg-white/10"
-              >
-                Close
-              </Button>
-              <Button
-                variant="glow"
-                size="lg"
-                onClick={handleRegister}
-                disabled={totalTickets === 0}
-                className="flex-1"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Register ({totalTickets} ticket{totalTickets !== 1 ? 's' : ''})
-              </Button>
-            </div>
-          )}
         </div>
+        
+        {/* Action Buttons - Fixed at bottom */}
+        {isSignedIn && (
+          <div className="flex-shrink-0 flex gap-4 pt-6 border-t border-white/20 mt-4">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleClose}
+              className="flex-1 border-white/20 text-white hover:bg-white/10"
+            >
+              Close
+            </Button>
+            <Button
+              variant="glow"
+              size="lg"
+              onClick={handleRegister}
+              disabled={totalTickets === 0}
+              className="flex-1"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Register ({totalTickets} ticket{totalTickets !== 1 ? 's' : ''})
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

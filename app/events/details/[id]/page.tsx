@@ -26,6 +26,7 @@ import {
   UserX
 } from 'lucide-react'
 import { formatDate, formatTime } from '@/lib/utils'
+import PromotionalBanners from '@/components/promotional-banners'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -367,6 +368,23 @@ export default function EventDetailsPage() {
 
               {/* Sidebar */}
               <div className="space-y-6">
+                
+                {/* Promotional Banners */}
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.05 }}
+                >
+                  <PromotionalBanners 
+                    eventData={event}
+                    totalTickets={0}
+                    onDiscountApply={(code) => {
+                      console.log('Event page coupon apply:', code)
+                      // You could show a modal or toast here
+                      alert(`Use code "${code}" when booking your tickets!`)
+                    }}
+                  />
+                </motion.div>
                 
                 {/* Event Details */}
                 <motion.div
