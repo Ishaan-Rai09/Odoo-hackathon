@@ -211,3 +211,4 @@ EventSchema.pre('save', function (next) {
 })
 
 export default mongoose.models.Event || mongoose.model<IEvent>('Event', EventSchema)
+
