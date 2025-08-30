@@ -78,6 +78,36 @@ export default function OrganizerDashboard() {
     router.push('/organizer/signin')
   }
 
+  const handleEditEvent = (eventId: string) => {
+    // For now, redirect to create event page with event ID for editing
+    router.push(`/organizer/create-event?edit=${eventId}`)
+  }
+
+  const handleDeleteEvent = async (eventId: string, eventName: string) => {
+    if (!confirm(`Are you sure you want to delete "${eventName}"? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/organizer/events?id=${eventId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        // Remove event from local state
+        setEvents(prevEvents => prevEvents.filter((event: any) => (event._id || event.id) !== eventId))
+        
+        // Show success message
+        alert('Event deleted successfully!')
+      } else {
+        throw new Error('Failed to delete event')
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error)
+      alert('Failed to delete event. Please try again.')
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black cyber-grid flex items-center justify-center">
@@ -90,14 +120,21 @@ export default function OrganizerDashboard() {
     return null
   }
 
-  // Calculate stats
+  // Calculate stats with better error handling
   const stats = {
     totalEvents: events.length,
     totalRegistrations: events.reduce((sum: number, event: any) => sum + (event.totalRegistrations || 0), 0),
     totalRevenue: events.reduce((sum: number, event: any) => {
-      return sum + (event.ticketTypes?.reduce((ticketSum: number, ticket: any) => ticketSum + (ticket.price * (ticket.soldCount || 0)), 0) || 0)
+      if (!event.ticketTypes || !Array.isArray(event.ticketTypes)) return sum
+      return sum + event.ticketTypes.reduce((ticketSum: number, ticket: any) => {
+        return ticketSum + ((ticket.price || 0) * (ticket.soldCount || 0))
+      }, 0)
     }, 0),
-    avgFillRate: events.length > 0 ? Math.round(events.reduce((sum: number, event: any) => sum + ((event.totalRegistrations || 0) / event.maxCapacity * 100), 0) / events.length) : 0
+    avgFillRate: events.length > 0 ? Math.round(events.reduce((sum: number, event: any) => {
+      const capacity = event.maxCapacity || 1
+      const registrations = event.totalRegistrations || 0
+      return sum + ((registrations / capacity) * 100)
+    }, 0) / events.length) : 0
   }
 
   return (
@@ -116,10 +153,12 @@ export default function OrganizerDashboard() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
+              <Link href="/organizer/settings">
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Button>
+              </Link>
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -314,26 +353,41 @@ export default function OrganizerDashboard() {
                           <div
                             className="bg-gradient-to-r from-cyber-blue to-cyber-pink h-2 rounded-full transition-all duration-300"
                             style={{
-                              width: `${(event.totalRegistrations / event.maxCapacity) * 100}%`,
+                              width: `${event.maxCapacity > 0 ? ((event.totalRegistrations || 0) / event.maxCapacity) * 100 : 0}%`,
                             }}
                           />
                         </div>
                         <p className="text-xs text-white/60">
-                          {Math.round((event.totalRegistrations / event.maxCapacity) * 100)}% capacity filled
+                          {event.maxCapacity > 0 ? Math.round(((event.totalRegistrations || 0) / event.maxCapacity) * 100) : 0}% capacity filled
                         </p>
                       </div>
                       
                       <div className="flex items-center gap-2 ml-6">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <BarChart3 className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
+                        <Link href={`/organizer/events/${event._id || event.id}`}>
+                          <Button variant="outline" size="sm" title="View Event Details">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Link href={`/organizer/analytics/${event._id || event.id}`}>
+                          <Button variant="outline" size="sm" title="View Analytics">
+                            <BarChart3 className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          title="Edit Event"
+                          onClick={() => handleEditEvent(event._id || event.id)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-400 border-red-400/30">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          title="Delete Event"
+                          className="text-red-400 border-red-400/30"
+                          onClick={() => handleDeleteEvent(event._id || event.id, event.name)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
