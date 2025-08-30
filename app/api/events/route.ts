@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Event from '@/lib/models/Event'
+import Organizer from '@/lib/models/Organizer'
 
 // Static events data (you can move this to a separate file if needed)
 const staticEvents = [
@@ -103,7 +104,6 @@ export async function GET(request: NextRequest) {
 
       // Then check MongoDB events
       const mongoEvent = await Event.findById(eventId)
-        .populate('organizer', 'name organizationName')
       
       if (mongoEvent && mongoEvent.isPublished) {
         // Transform MongoDB event to match frontend structure
@@ -143,37 +143,49 @@ export async function GET(request: NextRequest) {
 
     // Fetch published MongoDB events
     const mongoEvents = await Event.find({ isPublished: true })
-      .populate('organizer', 'name organizationName')
       .sort({ startDate: 1 })
 
-    // Transform MongoDB events to match frontend structure
-    const transformedMongoEvents = mongoEvents.map(event => ({
-      id: event._id.toString(),
-      title: event.name,
-      description: event.description,
-      image: event.coverImage || '/api/placeholder/400/300',
-      category: event.category,
-      date: event.startDate.toISOString().split('T')[0],
-      time: event.startDate.toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      }),
-      location: event.location.name,
-      locationAddress: event.location.address,
-      locationCoordinates: event.location.coordinates,
-      price: event.ticketTypes[0]?.price || 0,
-      maxCapacity: event.maxCapacity,
-      totalRegistrations: event.totalRegistrations,
-      startDate: event.startDate,
-      endDate: event.endDate,
-      registrationStart: event.registrationStart,
-      registrationEnd: event.registrationEnd,
-      ticketTypes: event.ticketTypes,
-      customQuestions: event.customQuestions,
-      organizer: event.organizer,
-      isMongoEvent: true
-    }))
+    // Fetch organizer details for each event
+    const transformedMongoEvents = await Promise.all(
+      mongoEvents.map(async (event) => {
+        let organizerInfo = null
+        try {
+          if (event.organizer) {
+            organizerInfo = await Organizer.findById(event.organizer).select('name organizationName')
+          }
+        } catch (err) {
+          console.log('Error fetching organizer:', err)
+        }
+
+        return {
+          id: event._id.toString(),
+          title: event.name,
+          description: event.description,
+          image: event.coverImage || '/api/placeholder/400/300',
+          category: event.category,
+          date: event.startDate.toISOString().split('T')[0],
+          time: event.startDate.toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+          }),
+          location: event.location.name,
+          locationAddress: event.location.address,
+          locationCoordinates: event.location.coordinates,
+          price: event.ticketTypes[0]?.price || 0,
+          maxCapacity: event.maxCapacity,
+          totalRegistrations: event.totalRegistrations,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          registrationStart: event.registrationStart,
+          registrationEnd: event.registrationEnd,
+          ticketTypes: event.ticketTypes,
+          customQuestions: event.customQuestions,
+          organizer: organizerInfo,
+          isMongoEvent: true
+        }
+      })
+    )
 
     // Combine static and MongoDB events
     let allEvents = [...staticEvents, ...transformedMongoEvents]
