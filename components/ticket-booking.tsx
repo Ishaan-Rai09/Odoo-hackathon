@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { AttendeeDetailsForm } from '@/components/attendee-details-form'
-import { Ticket, Users, Crown, Minus, Plus, X } from 'lucide-react'
+import { Ticket, Users, Crown, ChevronDown } from 'lucide-react'
 
 interface TicketBookingProps {
   event: any
@@ -29,10 +29,10 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
   const totalTickets = tickets.standard + tickets.vip
   const totalPrice = (tickets.standard * event.standardPrice) + (tickets.vip * event.vipPrice)
 
-  const updateTicketCount = (type: 'standard' | 'vip', increment: boolean) => {
+  const updateTicketCount = (type: 'standard' | 'vip', count: number) => {
     setTickets(prev => ({
       ...prev,
-      [type]: increment ? prev[type] + 1 : Math.max(0, prev[type] - 1)
+      [type]: count
     }))
   }
 
@@ -101,28 +101,19 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 border-white/20"
-                      onClick={() => updateTicketCount('standard', false)}
-                      disabled={tickets.standard === 0}
+                  <div className="relative">
+                    <select
+                      value={tickets.standard}
+                      onChange={(e) => updateTicketCount('standard', parseInt(e.target.value))}
+                      className="w-20 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-cyber-blue transition-colors appearance-none cursor-pointer"
                     >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="text-white font-medium w-8 text-center">
-                      {tickets.standard}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 border-white/20"
-                      onClick={() => updateTicketCount('standard', true)}
-                      disabled={totalTickets >= 10}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                      {Array.from({ length: Math.min(11, 11 - tickets.vip) }, (_, i) => (
+                        <option key={i} value={i} className="bg-black text-white">
+                          {i}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/60 pointer-events-none" />
                   </div>
                 </div>
               </CardContent>
@@ -148,28 +139,19 @@ export function TicketBooking({ event, isOpen, onClose }: TicketBookingProps) {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 border-yellow-400/30"
-                      onClick={() => updateTicketCount('vip', false)}
-                      disabled={tickets.vip === 0}
+                  <div className="relative">
+                    <select
+                      value={tickets.vip}
+                      onChange={(e) => updateTicketCount('vip', parseInt(e.target.value))}
+                      className="w-20 px-3 py-2 bg-white/10 border border-yellow-400/30 rounded-lg text-white focus:outline-none focus:border-yellow-400 transition-colors appearance-none cursor-pointer"
                     >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="text-white font-medium w-8 text-center">
-                      {tickets.vip}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 border-yellow-400/30"
-                      onClick={() => updateTicketCount('vip', true)}
-                      disabled={totalTickets >= 10}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                      {Array.from({ length: Math.min(11, 11 - tickets.standard) }, (_, i) => (
+                        <option key={i} value={i} className="bg-black text-white">
+                          {i}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/60 pointer-events-none" />
                   </div>
                 </div>
               </CardContent>

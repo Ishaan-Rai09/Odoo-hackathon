@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { UserButton, useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
-import { Menu, X, Search } from 'lucide-react'
+import { Menu, X, Search, Ticket, Settings } from 'lucide-react'
 import Link from 'next/link'
 
 export function Navbar() {
@@ -84,6 +84,28 @@ export function Navbar() {
               </Button>
             </motion.div>
 
+            {/* My Bookings - Only show when signed in */}
+            {mounted && isSignedIn && (
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link href="/my-bookings">
+                  <Button variant="outline" className="text-sm border-cyber-blue/30 text-cyber-blue hover:bg-cyber-blue/10">
+                    <Ticket className="h-4 w-4 mr-2" />
+                    My Bookings
+                  </Button>
+                </Link>
+              </motion.div>
+            )}
+
+            {/* Organizer Portal */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/organizer/signin">
+                <Button variant="cyber" className="text-sm bg-gradient-to-r from-cyber-purple to-cyber-pink">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Organizer Portal
+                </Button>
+              </Link>
+            </motion.div>
+
             {/* Auth */}
             {mounted ? (
               isSignedIn ? (
@@ -97,7 +119,7 @@ export function Navbar() {
               ) : (
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link href="/sign-in">
-                    <Button variant="cyber" className="text-sm">
+                    <Button variant="outline" className="text-sm border-white/20 text-white hover:bg-white/10">
                       Sign In
                     </Button>
                   </Link>
@@ -106,7 +128,7 @@ export function Navbar() {
             ) : (
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/sign-in">
-                  <Button variant="cyber" className="text-sm">
+                  <Button variant="outline" className="text-sm border-white/20 text-white hover:bg-white/10">
                     Sign In
                   </Button>
                 </Link>
@@ -155,20 +177,54 @@ export function Navbar() {
                 </motion.div>
               ))}
               
+              {/* My Bookings - Mobile */}
+              {mounted && isSignedIn && (
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <Link
+                    href="/my-bookings"
+                    className="text-cyber-blue hover:text-cyber-blue/80 block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Ticket className="h-4 w-4 mr-2" />
+                    My Bookings
+                  </Link>
+                </motion.div>
+              )}
+              
+              {/* Organizer Portal - Mobile */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                <Link
+                  href="/organizer/signin"
+                  className="text-cyber-purple hover:text-cyber-purple/80 block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Organizer Portal
+                </Link>
+              </motion.div>
+              
               <div className="flex items-center space-x-4 px-3 py-2">
                 {mounted ? (
                   isSignedIn ? (
                     <UserButton />
                   ) : (
                     <Link href="/sign-in">
-                      <Button variant="cyber" className="text-sm">
+                      <Button variant="outline" className="text-sm border-white/20 text-white hover:bg-white/10">
                         Sign In
                       </Button>
                     </Link>
                   )
                 ) : (
                   <Link href="/sign-in">
-                    <Button variant="cyber" className="text-sm">
+                    <Button variant="outline" className="text-sm border-white/20 text-white hover:bg-white/10">
                       Sign In
                     </Button>
                   </Link>

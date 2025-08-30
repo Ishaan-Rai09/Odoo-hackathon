@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
+import { PaymentPopup } from '@/components/payment-popup'
 import { User, ArrowLeft, CreditCard, CheckCircle } from 'lucide-react'
 
 interface AttendeeDetailsFormProps {
@@ -47,7 +48,7 @@ export function AttendeeDetailsForm({
     }))
   )
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false)
 
   const updateAttendee = (index: number, field: keyof AttendeeInfo, value: string) => {
     setAttendees(prev => prev.map((attendee, i) => 
@@ -94,28 +95,11 @@ export function AttendeeDetailsForm({
 
   const handleSubmit = async () => {
     if (!validateForm()) return
+    setShowPaymentPopup(true)
+  }
 
-    setIsSubmitting(true)
-    
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast({
-        title: "Registration Successful!",
-        description: `You have successfully registered ${totalTickets} ticket${totalTickets > 1 ? 's' : ''} for ${event.title}`,
-      })
-      
-      onClose()
-    } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description: "There was an error processing your registration. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  const handleClosePaymentPopup = () => {
+    setShowPaymentPopup(false)
   }
 
   const getTicketType = (index: number) => {
@@ -124,6 +108,20 @@ export function AttendeeDetailsForm({
     } else {
       return { type: 'VIP', price: event.vipPrice, color: 'text-yellow-400' }
     }
+  }
+
+  if (showPaymentPopup) {
+    return (
+      <PaymentPopup
+        event={event}
+        tickets={tickets}
+        attendees={attendees}
+        totalAmount={totalPrice}
+        isOpen={isOpen}
+        onClose={onClose}
+        onBack={() => setShowPaymentPopup(false)}
+      />
+    )
   }
 
   return (
@@ -291,7 +289,6 @@ export function AttendeeDetailsForm({
               size="lg"
               onClick={onBack}
               className="border-white/20 text-white hover:bg-white/10"
-              disabled={isSubmitting}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
@@ -302,7 +299,6 @@ export function AttendeeDetailsForm({
               size="lg"
               onClick={onClose}
               className="border-white/20 text-white hover:bg-white/10"
-              disabled={isSubmitting}
             >
               Cancel
             </Button>
@@ -311,15 +307,9 @@ export function AttendeeDetailsForm({
               variant="glow"
               size="lg"
               onClick={handleSubmit}
-              disabled={isSubmitting}
               className="flex-1"
             >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Processing...
-                </>
-              ) : totalPrice === 0 ? (
+              {totalPrice === 0 ? (
                 <>
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Complete Registration
@@ -327,7 +317,7 @@ export function AttendeeDetailsForm({
               ) : (
                 <>
                   <CreditCard className="h-4 w-4 mr-2" />
-                  Make Payment
+                  Proceed to Payment
                 </>
               )}
             </Button>

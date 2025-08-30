@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { TicketBooking } from '@/components/ticket-booking'
 import { 
   Calendar, 
   Clock, 
@@ -17,7 +18,9 @@ import {
   ArrowLeft,
   Loader2,
   Mail,
-  Phone
+  Phone,
+  Ticket,
+  Trophy
 } from 'lucide-react'
 import { formatDate, formatTime } from '@/lib/utils'
 import Image from 'next/image'
@@ -71,6 +74,7 @@ export default function EventDetailsPage() {
   const [event, setEvent] = useState<EventDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [showTicketBooking, setShowTicketBooking] = useState(false)
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -97,6 +101,21 @@ export default function EventDetailsPage() {
     fetchEvent()
   }, [eventId])
 
+  // Add default pricing if not provided
+  const eventWithPricing = event ? {
+    ...event,
+    standardPrice: event.ticketTypes?.[0]?.price ?? (event.price === 0 ? 0 : event.price || 25),
+    vipPrice: event.ticketTypes?.[1]?.price ?? (event.price === 0 ? 0 : (event.price ? event.price * 2 : 75))
+  } : null
+
+  const handleBookTickets = () => {
+    setShowTicketBooking(true)
+  }
+
+  const handleCloseTicketBooking = () => {
+    setShowTicketBooking(false)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black cyber-grid">
@@ -110,6 +129,20 @@ export default function EventDetailsPage() {
             </div>
           </div>
         </main>
+      </div>
+    )
+  }
+
+  // Show ticket booking popup
+  if (showTicketBooking && eventWithPricing) {
+    return (
+      <div className="min-h-screen bg-black cyber-grid">
+        <Navbar />
+        <TicketBooking
+          event={eventWithPricing}
+          isOpen={showTicketBooking}
+          onClose={() => setShowTicketBooking(false)}
+        />
       </div>
     )
   }
@@ -242,43 +275,77 @@ export default function EventDetailsPage() {
                 </motion.div>
 
                 {/* Ticket Types */}
-                {event.ticketTypes && event.ticketTypes.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                  >
-                    <Card className="event-card">
-                      <CardHeader>
-                        <h2 className="text-2xl font-bold text-white flex items-center">
-                          <DollarSign className="h-6 w-6 mr-2 text-cyber-blue" />
-                          Ticket Types
-                        </h2>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          {event.ticketTypes.map((ticket, index) => (
-                            <div key={index} className="border border-white/20 rounded-lg p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <h3 className="text-white font-medium">{ticket.name}</h3>
-                                <span className="text-cyber-blue font-bold">
-                                  ${ticket.price}
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-4 text-sm text-white/60">
-                                <div>Available: {ticket.maxTickets - ticket.soldCount}</div>
-                                <div>Max per person: {ticket.maxPerUser}</div>
-                              </div>
-                              <div className="mt-2 text-sm text-white/60">
-                                Sales: {formatDate(ticket.salesStart)} - {formatDate(ticket.salesEnd)}
-                              </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
+                  <Card className="event-card">
+                    <CardHeader>
+                      <h2 className="text-2xl font-bold text-white flex items-center">
+                        <DollarSign className="h-6 w-6 mr-2 text-cyber-blue" />
+                        Tickets Available
+                      </h2>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {/* Standard Ticket */}
+                        <div className="border border-white/20 rounded-lg p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center">
+                              <Ticket className="h-5 w-5 mr-2 text-cyber-blue" />
+                              <h3 className="text-white font-medium">Standard Ticket</h3>
                             </div>
-                          ))}
+                            <span className="text-cyber-blue font-bold">
+                              {eventWithPricing?.standardPrice === 0 ? 'Free' : `$${eventWithPricing?.standardPrice}`}
+                            </span>
+                          </div>
+                          <p className="text-white/60 text-sm">
+                            General admission with standard access to the event
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                )}
+
+                        {/* VIP Ticket */}
+                        <div className="border border-yellow-400/30 rounded-lg p-4 bg-yellow-400/5">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center">
+                              <Trophy className="h-5 w-5 mr-2 text-yellow-400" />
+                              <h3 className="text-white font-medium">VIP Ticket</h3>
+                              <Badge className="ml-2 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                                Premium
+                              </Badge>
+                            </div>
+                            <span className="text-yellow-400 font-bold">
+                              {eventWithPricing?.vipPrice === 0 ? 'Free' : `$${eventWithPricing?.vipPrice}`}
+                            </span>
+                          </div>
+                          <p className="text-white/60 text-sm">
+                            Premium access with exclusive perks and priority seating
+                          </p>
+                        </div>
+                        
+                        {/* Legacy ticket types display */}
+                        {event.ticketTypes && event.ticketTypes.length > 0 && (
+                          <div className="mt-6">
+                            <h4 className="text-lg font-semibold text-white mb-3">Additional Ticket Information</h4>
+                            {event.ticketTypes.map((ticket, index) => (
+                              <div key={index} className="border border-white/10 rounded-lg p-3 mb-2">
+                                <div className="flex justify-between items-start mb-1">
+                                  <span className="text-white/80 text-sm">{ticket.name}</span>
+                                  <span className="text-white/80 text-sm">${ticket.price}</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 text-xs text-white/60">
+                                  <div>Available: {ticket.maxTickets - ticket.soldCount}</div>
+                                  <div>Max per person: {ticket.maxPerUser}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </div>
 
               {/* Sidebar */}
@@ -350,9 +417,10 @@ export default function EventDetailsPage() {
 
                       <Separator className="bg-white/20" />
 
-                      {/* Registration Button */}
-                      <Button variant="cyber" className="w-full" size="lg">
-                        Register Now
+                      {/* Book Tickets Button */}
+                      <Button variant="cyber" className="w-full" size="lg" onClick={handleBookTickets}>
+                        <Ticket className="h-4 w-4 mr-2" />
+                        Book Tickets
                       </Button>
                       
                       <p className="text-white/60 text-xs text-center">
