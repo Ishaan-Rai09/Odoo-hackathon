@@ -42,6 +42,14 @@ A modern, luxurious college event listing website with cyberpunk + Apple aesthet
 - **Discounts & Promotions**: Complete coupon system with validation
 - **SEO Optimized**: Meta tags, Open Graph, and semantic HTML
 
+## 🎥 Demo Video
+
+Watch the platform in action:
+
+[![Elite College Events Platform Demo](https://img.youtube.com/vi/954seioV2n0/maxresdefault.jpg)](https://youtu.be/954seioV2n0)
+
+[🎬 View Demo Video](https://youtu.be/954seioV2n0)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
