@@ -1,0 +1,258 @@
+{
+  "categories": {
+    "technical": {
+      "id": "technical",
+      "name": "Technical",
+      "description": "Technology events, workshops, and competitions",
+      "icon": "🔧",
+      "color": "from-cyber-blue to-cyber-purple",
+      "events": [
+        {
+          "id": "hackathon-2024",
+          "title": "CyberHack 2024",
+          "description": "48-hour coding marathon with cutting-edge challenges",
+          "longDescription": "Join us for the most exciting hackathon of the year! CyberHack 2024 brings together the brightest minds in technology for 48 hours of non-stop coding, innovation, and creativity.\n\nThis event features:\n• Cutting-edge challenges in AI, Web3, and IoT\n• Mentorship from industry professionals\n• Networking opportunities with tech leaders\n• Amazing prizes and recognition\n\nWhether you're a beginner or an expert, this hackathon offers something for everyone. Form teams, build amazing projects, and compete for incredible prizes!",
+          "date": "2024-03-15",
+          "time": "09:00",
+          "venue": "Tech Hub Convention Center",
+          "location": "123 Innovation Drive, Silicon Valley, CA 94025",
+          "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/hackathon2024",
+          "registrationFee": "Free",
+          "badges": ["Hot", "Registration Closing Soon", "Prizes", "48 Hours"],
+          "maxParticipants": 200,
+          "registeredCount": 156,
+          "category": "Competition",
+          "difficulty": "Advanced",
+          "standardPrice": 0,
+          "vipPrice": 50,
+          "featured": true,
+          "prizes": [
+            {"position": "1st Place", "amount": "$5,000"},
+            {"position": "2nd Place", "amount": "$3,000"},
+            {"position": "3rd Place", "amount": "$2,000"}
+          ],
+          "organizer": {
+            "name": "Alex Johnson",
+            "email": "alex@techinnovators.com",
+            "phone": "+1 (555) 123-4567",
+            "organization": "Tech Innovators"
+          }
+        },
+        {
+          "id": "ai-workshop",
+          "title": "AI/ML Workshop Series",
+          "description": "Learn machine learning from industry experts",
+          "longDescription": "A comprehensive workshop series covering the fundamentals and advanced concepts of Artificial Intelligence and Machine Learning. Perfect for beginners and intermediate developers looking to expand their skillset.",
+          "date": "2024-03-22",
+          "time": "14:00",
+          "venue": "Innovation Center",
+          "location": "456 Learning Ave, Tech City, CA 94301",
+          "image": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/aiworkshop",
+          "badges": ["New", "Workshop"],
+          "maxParticipants": 50,
+          "currentParticipants": 23,
+          "category": "Workshop",
+          "difficulty": "Intermediate",
+          "standardPrice": 25,
+          "vipPrice": 75,
+          "organizer": {
+            "name": "Dr. Sarah Chen",
+            "email": "sarah@aiexperts.com",
+            "phone": "+1 (555) 234-5678",
+            "organization": "AI Experts Institute"
+          }
+        },
+        {
+          "id": "blockchain-seminar",
+          "title": "Future of Blockchain Technology",
+          "description": "Expert insights into blockchain and cryptocurrency trends",
+          "longDescription": "Join industry leaders for an in-depth seminar on the future of blockchain technology. Learn about the latest developments in DeFi, NFTs, and Web3 technologies from experts who are shaping the industry.",
+          "date": "2024-04-10",
+          "time": "18:00",
+          "venue": "Grand Conference Hall",
+          "location": "789 Business District, Financial Hub, NY 10001",
+          "image": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/blockchain-seminar",
+          "badges": ["Seminar", "Expert Panel"],
+          "maxParticipants": 300,
+          "currentParticipants": 180,
+          "category": "Seminar",
+          "difficulty": "All Levels",
+          "standardPrice": 50,
+          "vipPrice": 150,
+          "organizer": {
+            "name": "Michael Rodriguez",
+            "email": "michael@blockchainpro.com",
+            "phone": "+1 (555) 345-6789",
+            "organization": "Blockchain Professionals"
+          }
+        }
+      ]
+    },
+    "entertainment": {
+      "id": "entertainment",
+      "name": "Entertainment",
+      "description": "Concerts, comedy shows, and cultural events",
+      "icon": "🎭",
+      "color": "from-cyber-pink to-cyber-green",
+      "events": [
+        {
+          "id": "rock-concert-2024",
+          "title": "Rock Legends Live Concert",
+          "description": "Epic rock concert featuring top bands",
+          "longDescription": "Get ready for the most electrifying rock concert of the year! Join us for an unforgettable night featuring legendary rock bands and emerging artists. This high-energy event promises incredible performances, stunning visuals, and an atmosphere that will leave you wanting more.",
+          "date": "2024-04-20",
+          "time": "19:00",
+          "venue": "Elite Arena",
+          "location": "100 Music Boulevard, Entertainment District, LA 90028",
+          "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/rock-concert",
+          "badges": ["Hot", "Live Music", "Popular"],
+          "maxParticipants": 5000,
+          "currentParticipants": 3200,
+          "category": "Concert",
+          "difficulty": "All Levels",
+          "standardPrice": 75,
+          "vipPrice": 250,
+          "featured": true,
+          "organizer": {
+            "name": "Emily Davis",
+            "email": "emily@elitemusic.com",
+            "phone": "+1 (555) 456-7890",
+            "organization": "Elite Music Productions"
+          }
+        },
+        {
+          "id": "standup-night",
+          "title": "Elite Comedy Night",
+          "description": "Hilarious stand-up comedy performances",
+          "longDescription": "Laugh until your sides hurt at Elite Comedy Night! Featuring both established comedians and rising stars, this evening promises non-stop entertainment. From observational humor to witty storytelling, our lineup has something for everyone.",
+          "date": "2024-03-25",
+          "time": "20:00",
+          "venue": "Comedy Club Elite",
+          "location": "555 Laughter Lane, Comedy District, Chicago, IL 60601",
+          "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/comedy-night",
+          "badges": ["Comedy", "Live Show", "Hot"],
+          "maxParticipants": 200,
+          "currentParticipants": 145,
+          "category": "Comedy",
+          "difficulty": "All Levels",
+          "standardPrice": 30,
+          "vipPrice": 80,
+          "featured": true,
+          "organizer": {
+            "name": "David Wilson",
+            "email": "david@comedycentral.com",
+            "phone": "+1 (555) 567-8901",
+            "organization": "Comedy Central Hub"
+          }
+        },
+        {
+          "id": "cultural-festival",
+          "title": "International Cultural Festival",
+          "description": "Celebrating diversity through arts and culture",
+          "longDescription": "Experience the rich tapestry of global cultures at our International Cultural Festival. Enjoy traditional performances, authentic cuisine, art exhibitions, and interactive workshops from cultures around the world.",
+          "date": "2024-04-08",
+          "time": "15:00",
+          "venue": "Cultural Center Plaza",
+          "location": "777 Heritage Square, Cultural District, Miami, FL 33101",
+          "image": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/cultural-festival",
+          "badges": ["Cultural", "Festival", "International"],
+          "maxParticipants": 1000,
+          "currentParticipants": 650,
+          "category": "Festival",
+          "difficulty": "All Levels",
+          "standardPrice": 20,
+          "vipPrice": 60,
+          "organizer": {
+            "name": "Maria Gonzalez",
+            "email": "maria@culturalcelebrations.com",
+            "phone": "+1 (555) 678-9012",
+            "organization": "Cultural Celebrations Inc"
+          }
+        }
+      ]
+    },
+    "business": {
+      "id": "business",
+      "name": "Business & Professional",
+      "description": "Seminars, conferences, and networking events",
+      "icon": "💼",
+      "color": "from-cyber-purple to-cyber-blue",
+      "events": [
+        {
+          "id": "entrepreneurship-seminar",
+          "title": "Entrepreneurship Success Summit",
+          "description": "Learn from successful entrepreneurs and business leaders",
+          "longDescription": "A comprehensive seminar designed for aspiring entrepreneurs and business professionals. Learn from industry veterans about starting, scaling, and managing successful businesses. Network with like-minded individuals and gain valuable insights.",
+          "date": "2024-04-15",
+          "time": "09:00",
+          "venue": "Business Convention Center",
+          "location": "321 Corporate Blvd, Business District, Austin, TX 78701",
+          "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/entrepreneur-summit",
+          "badges": ["Seminar", "Networking", "Professional"],
+          "maxParticipants": 500,
+          "currentParticipants": 320,
+          "category": "Seminar",
+          "difficulty": "All Levels",
+          "standardPrice": 100,
+          "vipPrice": 300,
+          "featured": true,
+          "organizer": {
+            "name": "Robert Kim",
+            "email": "robert@businessleaders.com",
+            "phone": "+1 (555) 789-0123",
+            "organization": "Business Leaders Forum"
+          }
+        }
+      ]
+    },
+    "sports": {
+      "id": "sports",
+      "name": "Sports",
+      "description": "Athletic competitions and fitness events",
+      "icon": "⚽",
+      "color": "from-cyber-green to-cyber-blue",
+      "events": [
+        {
+          "id": "championship-final",
+          "title": "Elite Championship Final",
+          "description": "The ultimate football championship match",
+          "longDescription": "Witness the most anticipated football match of the season! Two elite teams battle for the championship title in this high-stakes final match. Experience the thrill, passion, and excitement of professional football at its finest.",
+          "date": "2024-04-15",
+          "time": "16:00",
+          "venue": "Elite Stadium",
+          "location": "100 Champions Way, Sports Complex, Denver, CO 80202",
+          "image": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          "registrationLink": "https://forms.google.com/championship-final",
+          "badges": ["Championship", "Hot", "Final"],
+          "maxParticipants": 50000,
+          "currentParticipants": 42000,
+          "category": "Tournament",
+          "difficulty": "Spectator",
+          "standardPrice": 80,
+          "vipPrice": 300,
+          "featured": true,
+          "organizer": {
+            "name": "Marcus Thompson",
+            "email": "marcus@elitesports.com",
+            "phone": "+1 (555) 901-2345",
+            "organization": "Elite Sports Management"
+          }
+        }
+      ]
+    }
+  },
+  "featuredEvents": [
+    "hackathon-2024",
+    "rock-concert-2024", 
+    "championship-final",
+    "standup-night",
+    "entrepreneurship-seminar"
+  ]
+}

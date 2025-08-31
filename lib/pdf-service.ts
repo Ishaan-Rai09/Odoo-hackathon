@@ -84,7 +84,7 @@ export class PDFService {
       pdf.text(ticketData.eventTitle, 105, 50, { align: 'center' })
 
       // Ticket type badge
-      const badgeColor = ticketData.ticketType === 'vip' ? [255, 215, 0] : [0, 200, 255]
+      const badgeColor: [number, number, number] = ticketData.ticketType === 'vip' ? [255, 215, 0] : [0, 200, 255]
       pdf.setFillColor(...badgeColor)
       pdf.rect(150, 15, 40, 8, 'F')
       pdf.setTextColor(0, 0, 0)
@@ -305,7 +305,7 @@ export class PDFService {
     pdf.text(ticketData.eventTitle, 105, 50, { align: 'center' })
 
     // Ticket type badge
-    const badgeColor = ticketData.ticketType === 'vip' ? [255, 215, 0] : [0, 200, 255]
+    const badgeColor: [number, number, number] = ticketData.ticketType === 'vip' ? [255, 215, 0] : [0, 200, 255]
     pdf.setFillColor(...badgeColor)
     pdf.rect(150, 15, 40, 8, 'F')
     pdf.setTextColor(0, 0, 0)

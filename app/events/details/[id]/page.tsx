@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { useAuth } from '@/lib/auth/auth-context'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { TicketBooking } from '@/components/ticket-booking'
 import { 
   Calendar, 
@@ -20,9 +22,11 @@ import {
   Mail,
   Phone,
   Ticket,
-  Trophy
+  Trophy,
+  UserX
 } from 'lucide-react'
 import { formatDate, formatTime } from '@/lib/utils'
+import PromotionalBanners from '@/components/promotional-banners'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -70,11 +74,13 @@ interface EventDetails {
 export default function EventDetailsPage() {
   const params = useParams()
   const eventId = params?.id as string
+  const { user, loading: authLoading } = useAuth()
   
   const [event, setEvent] = useState<EventDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showTicketBooking, setShowTicketBooking] = useState(false)
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false)
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -109,6 +115,18 @@ export default function EventDetailsPage() {
   } : null
 
   const handleBookTickets = () => {
+    if (authLoading) {
+      // Still loading auth state, do nothing
+      return
+    }
+    
+    if (!user) {
+      // User is not signed in, show sign-in prompt
+      setShowSignInPrompt(true)
+      return
+    }
+    
+    // User is signed in, proceed with booking
     setShowTicketBooking(true)
   }
 
@@ -351,6 +369,23 @@ export default function EventDetailsPage() {
               {/* Sidebar */}
               <div className="space-y-6">
                 
+                {/* Promotional Banners */}
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.05 }}
+                >
+                  <PromotionalBanners 
+                    eventData={event}
+                    totalTickets={0}
+                    onDiscountApply={(code) => {
+                      console.log('Event page coupon apply:', code)
+                      // You could show a modal or toast here
+                      alert(`Use code "${code}" when booking your tickets!`)
+                    }}
+                  />
+                </motion.div>
+                
                 {/* Event Details */}
                 <motion.div
                   initial={{ opacity: 0, x: 30 }}
@@ -418,9 +453,24 @@ export default function EventDetailsPage() {
                       <Separator className="bg-white/20" />
 
                       {/* Book Tickets Button */}
-                      <Button variant="cyber" className="w-full" size="lg" onClick={handleBookTickets}>
-                        <Ticket className="h-4 w-4 mr-2" />
-                        Book Tickets
+                      <Button 
+                        variant="cyber" 
+                        className="w-full" 
+                        size="lg" 
+                        onClick={handleBookTickets}
+                        disabled={authLoading}
+                      >
+                        {authLoading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <Ticket className="h-4 w-4 mr-2" />
+                            Book Tickets
+                          </>
+                        )}
                       </Button>
                       
                       <p className="text-white/60 text-xs text-center">
@@ -436,6 +486,35 @@ export default function EventDetailsPage() {
           </div>
         </section>
       </main>
+      
+      {/* Sign-In Prompt Dialog */}
+      <Dialog open={showSignInPrompt} onOpenChange={setShowSignInPrompt}>
+        <DialogContent className="sm:max-w-md bg-gray-900/95 backdrop-blur-sm border border-white/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-white">
+              <UserX className="h-5 w-5 mr-2 text-cyber-blue" />
+              Sign In Required
+            </DialogTitle>
+            <DialogDescription className="text-white/70">
+              You need to be signed in to book tickets for this event.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSignInPrompt(false)}
+              className="text-white border-white/20 hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Link href="/sign-in" className="flex-1">
+              <Button variant="cyber" className="w-full">
+                Sign In to Continue
+              </Button>
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

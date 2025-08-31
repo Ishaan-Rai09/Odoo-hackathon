@@ -153,6 +153,18 @@ export default function OrganizerDashboard() {
             </div>
 
             <div className="flex items-center space-x-4">
+              <Link href="/organizer/attendees">
+                <Button variant="outline" size="sm">
+                  <Users className="h-4 w-4 mr-2" />
+                  Manage Attendees
+                </Button>
+              </Link>
+              <Link href="/organizer/browse-events">
+                <Button variant="outline" size="sm">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Browse Events
+                </Button>
+              </Link>
               <Link href="/organizer/settings">
                 <Button variant="outline" size="sm">
                   <Settings className="h-4 w-4 mr-2" />
@@ -366,6 +378,11 @@ export default function OrganizerDashboard() {
                         <Link href={`/organizer/events/${event._id || event.id}`}>
                           <Button variant="outline" size="sm" title="View Event Details">
                             <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Link href={`/organizer/attendees?eventId=${event._id || event.id}`}>
+                          <Button variant="outline" size="sm" title="Manage Attendees">
+                            <Users className="h-4 w-4" />
                           </Button>
                         </Link>
                         <Link href={`/organizer/analytics/${event._id || event.id}`}>

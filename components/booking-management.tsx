@@ -187,14 +187,14 @@ export default function BookingManagement({ userId, bookings, onBookingUpdated }
     }
   }
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateInput: string | Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    }).format(new Date(dateString))
+    }).format(dateInput instanceof Date ? dateInput : new Date(dateInput))
   }
 
   const canCancelBooking = (booking: Booking) => {

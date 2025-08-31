@@ -126,15 +126,15 @@ export function AttendeeDetailsForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black/95 border border-white/20">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] bg-black/95 border border-white/20 flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-white flex items-center">
             <User className="h-6 w-6 mr-3 text-cyber-blue" />
             Attendee Details
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto space-y-6 pr-2">
           {/* Event & Ticket Summary */}
           <Card className="glassmorphism border-cyber-blue/30">
             <CardContent className="p-6">
@@ -282,46 +282,47 @@ export function AttendeeDetailsForm({
             </CardContent>
           </Card>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 pt-6 border-t border-white/20">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={onBack}
-              className="border-white/20 text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={onClose}
-              className="border-white/20 text-white hover:bg-white/10"
-            >
-              Cancel
-            </Button>
-            
-            <Button
-              variant="glow"
-              size="lg"
-              onClick={handleSubmit}
-              className="flex-1"
-            >
-              {totalPrice === 0 ? (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Complete Registration
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Proceed to Payment
-                </>
-              )}
-            </Button>
-          </div>
+        </div>
+        
+        {/* Action Buttons - Fixed at bottom */}
+        <div className="flex-shrink-0 flex gap-4 pt-6 border-t border-white/20 mt-4">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={onBack}
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={onClose}
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Cancel
+          </Button>
+          
+          <Button
+            variant="glow"
+            size="lg"
+            onClick={handleSubmit}
+            className="flex-1"
+          >
+            {totalPrice === 0 ? (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Complete Registration
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-4 w-4 mr-2" />
+                Proceed to Payment
+              </>
+            )}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

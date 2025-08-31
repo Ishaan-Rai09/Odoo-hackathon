@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,15 +13,14 @@ import { EventForm } from '@/components/event-form'
 import eventsData from '@/data/events.json'
 
 export default function AdminPage() {
-  const { user, isLoaded } = useUser()
+  const { user, loading } = useAuth()
   const [isEventFormOpen, setIsEventFormOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState(null)
 
   // Check if user is admin (you can implement your own logic here)
-  const isAdmin = user?.emailAddresses[0]?.emailAddress?.includes('admin') || 
-                  user?.publicMetadata?.role === 'admin'
+  const isAdmin = user?.email?.includes('admin') || user?.role === 'admin'
 
-  if (!isLoaded) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-black cyber-grid flex items-center justify-center">
         <div className="cyber-spinner" />

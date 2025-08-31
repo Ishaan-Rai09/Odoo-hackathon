@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/lib/auth/auth-context'
 import { 
   CreditCard, 
   CheckCircle, 
@@ -53,7 +53,7 @@ export function PaymentPopup({
   onBack 
 }: PaymentPopupProps) {
   const { toast } = useToast()
-  const { user } = useUser()
+  const { user } = useAuth()
   const [stage, setStage] = useState<PaymentStage>('payment')
   const [paymentMethod, setPaymentMethod] = useState('credit_card')
   const [bookingData, setBookingData] = useState<BookingData | null>(null)
@@ -138,7 +138,7 @@ export function PaymentPopup({
           booking,
           qrCodes,
           user.id,
-          user.primaryEmailAddress?.emailAddress || attendees[0].email
+          user.email || attendees[0].email
         )
         
         if (saved) {
@@ -202,8 +202,8 @@ export function PaymentPopup({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl bg-black/95 border border-white/20">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] bg-black/95 border border-white/20 flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-white flex items-center">
             {stage === 'payment' && (
               <>
@@ -238,7 +238,7 @@ export function PaymentPopup({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto space-y-6 pr-2">
           {/* Payment Stage */}
           {stage === 'payment' && (
             <motion.div
@@ -487,91 +487,92 @@ export function PaymentPopup({
             </motion.div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 pt-6 border-t border-white/20">
-            {stage === 'payment' && (
-              <>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={onBack}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleClose}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="glow"
-                  size="lg"
-                  onClick={handlePayment}
-                  className="flex-1"
-                >
-                  {totalAmount === 0 ? (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Complete Registration
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Pay ${totalAmount}
-                    </>
-                  )}
-                </Button>
-              </>
-            )}
+        </div>
+        
+        {/* Action Buttons - Fixed at bottom */}
+        <div className="flex-shrink-0 flex gap-4 pt-6 border-t border-white/20 mt-4">
+          {stage === 'payment' && (
+            <>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={onBack}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleClose}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="glow"
+                size="lg"
+                onClick={handlePayment}
+                className="flex-1"
+              >
+                {totalAmount === 0 ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Complete Registration
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay ${totalAmount}
+                  </>
+                )}
+              </Button>
+            </>
+          )}
 
-            {stage === 'failed' && (
-              <>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setStage('payment')}
-                  className="flex-1 border-white/20 text-white hover:bg-white/10"
-                >
-                  Try Again
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleClose}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
+          {stage === 'failed' && (
+            <>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setStage('payment')}
+                className="flex-1 border-white/20 text-white hover:bg-white/10"
+              >
+                Try Again
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleClose}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                Cancel
+              </Button>
+            </>
+          )}
 
-            {stage === 'complete' && (
-              <>
-                <Button
-                  variant="cyber"
-                  size="lg"
-                  onClick={downloadTickets}
-                  className="flex-1"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Tickets
-                </Button>
-                <Button
-                  variant="glow"
-                  size="lg"
-                  onClick={handleClose}
-                  className="flex-1"
-                >
-                  Done
-                </Button>
-              </>
-            )}
-          </div>
+          {stage === 'complete' && (
+            <>
+              <Button
+                variant="cyber"
+                size="lg"
+                onClick={downloadTickets}
+                className="flex-1"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Tickets
+              </Button>
+              <Button
+                variant="glow"
+                size="lg"
+                onClick={handleClose}
+                className="flex-1"
+              >
+                Done
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

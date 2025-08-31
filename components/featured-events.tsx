@@ -165,7 +165,7 @@ export function FeaturedEvents() {
 
                   {/* CTA Button */}
                   <div className="flex gap-3">
-                    <Link href={`/events/${event.categoryId}/${event.id}`} className="flex-1">
+                    <Link href={`/events/details/${event.id}`} className="flex-1">
                       <Button variant="cyber" className="w-full">
                         View Details
                       </Button>
