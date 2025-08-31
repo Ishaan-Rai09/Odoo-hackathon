@@ -6,7 +6,7 @@ A modern, luxurious event listing website with cyberpunk + Apple aesthetic, feat
 
 ### 🔐 Authentication
 - **Custom Authentication**: Secure sign-in and sign-up with credentials
-- **Role-Based Access**: Two distinct roles with different permissions
+- **Role-Based Access**: Two distinct roles with different permissions :- Organizer and User 
 - **Protected Routes**: Admin panel and user-specific features
 
 ### 🎨 Design & UI
