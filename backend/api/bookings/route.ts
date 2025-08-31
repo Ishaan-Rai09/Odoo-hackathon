@@ -8,17 +8,20 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2'
 // GET /api/bookings - Get user's bookings
 export async function GET(request: NextRequest) {
   try {
+    console.log('📊 Starting bookings fetch...')
     const authResult = validateToken(request)
     
     if (!authResult) {
+      console.log('❌ Auth failed for bookings request')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     
     const { userId } = authResult
+    console.log('✅ Auth successful, userId:', userId)
 
     // Try MySQL first, fallback to MongoDB
     try {
-      console.log('📊 Fetching bookings from MySQL...')
+      console.log('📊 Fetching bookings from MySQL for user:', userId)
       const connection = await mysqlPool.getConnection()
       
       const [bookingRows] = await connection.execute<RowDataPacket[]>(`

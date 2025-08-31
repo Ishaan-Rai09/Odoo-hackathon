@@ -68,30 +68,64 @@ export async function GET(request: NextRequest) {
           let totalRegistrations = 0
           let ticketTypesWithSales = event.ticketTypes
           
+          // Initialize realTimeStats outside try block
+          let realTimeStats = {
+            totalRegistrations: 0,
+            totalRevenue: 0,
+            confirmedBookings: 0,
+            pendingBookings: 0,
+            cancelledBookings: 0
+          }
+          
           try {
             const connection = await mysqlPool.getConnection()
             
-            // Get total bookings for this event
+            // Get comprehensive booking stats for this event
             const [bookingStats] = await connection.execute<RowDataPacket[]>(`
               SELECT 
-                COUNT(*) as totalBookings,
-                SUM(standard_tickets + vip_tickets) as totalAttendees
-              FROM bookings 
-              WHERE event_id = ? AND status != 'cancelled'
+                COUNT(DISTINCT b.booking_id) as totalBookings,
+                SUM(b.standard_tickets + b.vip_tickets) as totalAttendees,
+                SUM(CASE WHEN b.status = 'confirmed' THEN b.total_amount ELSE 0 END) as totalRevenue,
+                SUM(CASE WHEN b.status = 'confirmed' THEN 1 ELSE 0 END) as confirmedBookings,
+                SUM(CASE WHEN b.status = 'pending' THEN 1 ELSE 0 END) as pendingBookings,
+                SUM(CASE WHEN b.status = 'cancelled' THEN 1 ELSE 0 END) as cancelledBookings
+              FROM bookings b
+              WHERE b.event_id = ?
+            `, [event._id.toString()])
+            
+            // Get ticket type breakdown
+            const [ticketStats] = await connection.execute<RowDataPacket[]>(`
+              SELECT 
+                a.ticket_type,
+                COUNT(*) as soldCount
+              FROM attendees a
+              JOIN bookings b ON a.booking_id = b.booking_id
+              WHERE b.event_id = ? AND b.status != 'cancelled'
+              GROUP BY a.ticket_type
             `, [event._id.toString()])
             
             if (bookingStats[0]) {
-              totalRegistrations = parseInt(bookingStats[0].totalAttendees) || 0
+              realTimeStats = {
+                totalRegistrations: parseInt(bookingStats[0].totalAttendees) || 0,
+                totalRevenue: parseFloat(bookingStats[0].totalRevenue) || 0,
+                confirmedBookings: parseInt(bookingStats[0].confirmedBookings) || 0,
+                pendingBookings: parseInt(bookingStats[0].pendingBookings) || 0,
+                cancelledBookings: parseInt(bookingStats[0].cancelledBookings) || 0
+              }
+              totalRegistrations = realTimeStats.totalRegistrations
             }
             
-            // Update ticket types with sold counts
+            // Update ticket types with real sold counts from MySQL
+            const ticketSalesMap = new Map()
+            ticketStats.forEach((row: any) => {
+              ticketSalesMap.set(row.ticket_type, parseInt(row.soldCount) || 0)
+            })
+            
             ticketTypesWithSales = event.ticketTypes.map((ticket: any) => {
-              // For now, distribute sales proportionally
-              const proportion = ticket.maxTickets / event.maxCapacity
-              const estimatedSold = Math.floor(totalRegistrations * proportion)
+              const actualSoldCount = ticketSalesMap.get(ticket.name) || 0
               return {
                 ...ticket.toObject(),
-                soldCount: Math.min(estimatedSold, ticket.maxTickets)
+                soldCount: Math.min(actualSoldCount, ticket.maxTickets)
               }
             })
             
@@ -116,7 +150,11 @@ export async function GET(request: NextRequest) {
           return {
             ...event.toObject(),
             totalRegistrations,
-            ticketTypes: ticketTypesWithSales
+            ticketTypes: ticketTypesWithSales,
+            realTimeStats: {
+              ...realTimeStats,
+              lastUpdated: new Date().toISOString()
+            }
           }
         })
       )
