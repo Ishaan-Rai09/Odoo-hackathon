@@ -1,12 +1,12 @@
-# 🎉 Elite College Events Platform
+# 🎉 Elite Events Platform
 
-A modern, luxurious college event listing website with cyberpunk + Apple aesthetic, featuring authentication, event categories, and stunning animations.
+A modern, luxurious event listing website with cyberpunk + Apple aesthetic, featuring custom authentication, event categories, and stunning animations.
 
 ## ✨ Features
 
 ### 🔐 Authentication
-- **Clerk Integration**: Secure sign-in with official college email domain restriction
-- **Domain Restriction**: Only students with `@yourcollege.edu` emails can register
+- **Custom Authentication**: Secure sign-in and sign-up with credentials
+- **Role-Based Access**: Two distinct roles with different permissions :- Organizer and User 
 - **Protected Routes**: Admin panel and user-specific features
 
 ### 🎨 Design & UI
@@ -36,18 +36,29 @@ A modern, luxurious college event listing website with cyberpunk + Apple aesthet
 - **Next.js 14**: Latest App Router with TypeScript
 - **Tailwind CSS**: Utility-first styling with custom cyberpunk theme
 - **Shadcn UI**: High-quality, accessible component library
-- **MongoDB & MySQL**: Dual database support for events and bookings
+- **MySQL & MongoDB**: Dual database support - MySQL for user credentials and authentication, MongoDB for events and bookings
+- **Custom Auth System**: Built-in authentication with credential storage
+- **Role-Based Access Control**: Two-tier permission system
 - **Attendee Dashboard**: Full booking management with refund policy
 - **Loyalty Points System**: Tier-based rewards with automatic calculations
 - **Discounts & Promotions**: Complete coupon system with validation
 - **SEO Optimized**: Meta tags, Open Graph, and semantic HTML
+
+## 🎥 Demo Video
+
+Watch the platform in action:
+
+[![Elite College Events Platform Demo](https://img.youtube.com/vi/954seioV2n0/maxresdefault.jpg)](https://youtu.be/954seioV2n0)
+
+[🎬 View Demo Video](https://youtu.be/954seioV2n0)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
-- Clerk account for authentication
+- MySQL database for user credentials
+- MongoDB database for events and bookings
 
 ### Installation
 
@@ -65,18 +76,26 @@ A modern, luxurious college event listing website with cyberpunk + Apple aesthet
 
 3. **Set up environment variables**
    
-   Copy `.env.local` and update with your Clerk keys:
+   Copy `.env.local` and update with your database connections:
    ```bash
-   # Clerk Authentication
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
-   CLERK_SECRET_KEY=sk_test_your_key_here
+   # MySQL Database (for user credentials)
+   MYSQL_HOST=localhost
+   MYSQL_PORT=3306
+   MYSQL_USER=your_mysql_user
+   MYSQL_PASSWORD=your_mysql_password
+   MYSQL_DATABASE=your_mysql_database
+   
+   # MongoDB Database (for events and bookings)
+   MONGODB_URI=mongodb://localhost:27017/your_mongodb_database
+   
+   # JWT Secret for authentication
+   JWT_SECRET=your_jwt_secret_key
    ```
 
-4. **Configure Clerk**
-   - Create a Clerk application at [clerk.com](https://clerk.com)
-   - Enable email/password authentication
-   - Set up domain restrictions in Clerk dashboard
-   - Copy your publishable and secret keys
+4. **Set up databases**
+   - Set up MySQL database for user authentication and credentials
+   - Set up MongoDB for events, bookings, and related data
+   - Run database migrations/setup scripts if available
 
 5. **Run the development server**
    ```bash
@@ -139,11 +158,11 @@ Update `data/events.json` to add/modify:
 - Registration links
 - Images and badges
 
-### College Branding
-1. Update college domain in `.env.local`
-2. Replace logo in navbar component
-3. Modify hero section text and branding
-4. Update meta tags in `layout.tsx`
+### Platform Branding
+1. Replace logo in navbar component
+2. Modify hero section text and branding
+3. Update meta tags in `layout.tsx`
+4. Customize role-based access permissions
 
 ## ✅ Fully Implemented Features
 
@@ -213,15 +232,16 @@ Update `data/events.json` to add/modify:
 - **`/events/details/[id]`** - Event details with promotional banners
 - **`/my-bookings`** - Attendee dashboard to view and manage tickets, download PDFs, and cancel bookings with refund and loyalty integration
 - **`/referral`** - Referral system with reward tracking and social sharing
-- **`/sign-in`** - Authentication (Clerk)
-- **`/sign-up`** - Registration (Clerk)
+- **`/sign-in`** - Custom authentication with credentials
+- **`/sign-up`** - Custom registration with role assignment
 - **`/admin/coupons`** - Complete coupon management interface
 
 ## 🛡 Security Features
 
-- **Domain-restricted registration**: Only college emails allowed
+- **Role-based access control**: Two-tier permission system
 - **Protected routes**: Middleware-based route protection
-- **Secure authentication**: Clerk handles all auth security
+- **Secure authentication**: Custom JWT-based authentication system
+- **Password hashing**: Secure credential storage in MySQL
 - **Input validation**: Form validation and sanitization
 - **HTTPS enforcement**: Secure data transmission
 
